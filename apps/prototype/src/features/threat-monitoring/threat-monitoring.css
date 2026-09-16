@@ -1,3 +1,10 @@
+/* Page furniture only.
+   The table, its toolbar, its footer and every module a row is made of come
+   from @clickguard/ui — including the layout of the card itself. What is left
+   here is the page heading and the two places this screen asks a shared
+   component to behave differently, both expressed as constraints rather than
+   as restyling. */
+
 .tm__title {
   margin-block-end: var(--space-5);
   color: var(--text-primary);
@@ -7,123 +14,19 @@
   letter-spacing: var(--letter-spacing-tight);
 }
 
-/* Filters live above the card: they act on the whole list, not on the rows
-   currently drawn inside it. */
-.tm__filters {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2);
-  margin-block-end: var(--space-3);
-}
-
+/* The search field is the one control in the toolbar that should absorb spare
+   width — but not all of it, or the filters beside it drift to the far edge. */
 .tm__search {
   flex: 1 1 var(--space-48);
   min-width: 0;
   max-width: var(--space-96);
 }
 
-.tm__filters-spacer { margin-inline-start: auto; }
-
 .tm__count {
   font-variant-numeric: tabular-nums;
   text-align: center;
 }
 
-/* ---- Cells ----------------------------------------------------------------- */
-
-/* Two jobs, two typographic voices: the address is data (mono, tabular) and the
-   timestamp is context (sans, secondary). Neither is a link colour — the whole
-   row is the target, so blue would lie about where the click goes. */
-.tm__identity {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--space-2);
-}
-
-.tm__ip {
-  font-size: var(--font-size-300);
-  line-height: var(--line-height-300);
-  font-weight: var(--font-weight-medium);
-  font-variant-numeric: tabular-nums;
-  color: var(--text-primary);
-}
-
-/* Same voice as the location beneath it: both are context, not content. */
-.tm__when {
-  color: var(--text-secondary);
-  font-size: var(--font-size-100);
-  line-height: var(--line-height-100);
-  font-weight: var(--font-weight-medium);
-  white-space: nowrap;
-}
-
-.tm__status {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.tm__risk {
-  display: flex;
-  /* A shrink-to-content column collapses the bar to a stub. Floor it at a width
-     where "96 [====    ]" is readable, and cap it so it never sprawls. */
-  min-width: var(--space-24);
-  max-width: var(--space-48);
-}
-
-/* The sentence carries the finding; the dot only speeds up scanning. */
-.tm__rhythm {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-300);
-  line-height: var(--line-height-300);
-  font-weight: var(--font-weight-medium);
-  color: var(--text-primary);
-  white-space: nowrap;
-}
-
-.tm__converted {
-  font-size: var(--font-size-300);
-  line-height: var(--line-height-300);
-  font-weight: var(--font-weight-medium);
-  color: var(--status-danger-text);
-}
-
-.tm__converted[data-converted='true'] { color: var(--status-success-text); }
-
-/* Two lines, never three: the saved figure must not wrap away from its word. */
-.tm__cost {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-0);
-}
-
-.tm__cost-value {
-  font-size: var(--font-size-300);
-  line-height: var(--line-height-300);
-  font-weight: var(--font-weight-medium);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.tm__cost-saved {
-  color: var(--status-success-text);
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-100);
-  line-height: var(--line-height-100);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
 @media (max-width: 768px) {
   .tm__search { max-width: none; }
-  .tm__identity { row-gap: var(--space-0); }
-  .tm__risk { max-width: none; flex: 0 1 55%; }
-  .tm__cost { align-items: flex-start; }
-  .tm__rhythm { white-space: normal; }
 }

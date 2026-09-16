@@ -5,10 +5,15 @@ import {
   CellActions,
   CellData,
   CellLead,
+  CellMoney,
+  CellSignal,
   CellStack,
+  CellVerdict,
   Table,
   TableFooter,
   TablePanel,
+  TableToolbar,
+  ToolbarSpacer,
   Td,
   Th,
   type SortDirection,
@@ -16,7 +21,9 @@ import {
 import { Button } from '../Button/Button';
 import { Dot } from '../Dot/Dot';
 import { Icon } from '../Icon/Icon';
+import { Input } from '../Field/Input';
 import { Pill } from '../Pill/Pill';
+import { Select } from '../Field/Select';
 import { Progress } from '../Progress/Progress';
 
 /* The same nine columns Threat Monitoring ships, assembled from the same parts.
@@ -68,6 +75,19 @@ const statusMeta = {
   clean: { label: 'Clean', tone: 'clean', icon: 'shield-check' },
 } as const;
 
+const statusFilter = [
+  { value: 'all', label: 'All statuses' },
+  { value: 'blocked', label: 'Blocked' },
+  { value: 'monitoring', label: 'Monitoring' },
+  { value: 'clean', label: 'Clean' },
+];
+
+const rangeFilter = [
+  { value: '7', label: 'Last 7 days' },
+  { value: '30', label: 'Last 30 days' },
+  { value: '90', label: 'Last 90 days' },
+];
+
 const riskTone = (score: number) => (score >= 85 ? 'malicious' : score >= 45 ? 'suspicious' : 'clean');
 const money = (value: number) => value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 
@@ -93,6 +113,20 @@ function VisitorTable({ density }: { density?: 'compact' | 'default' | 'comforta
 
   return (
     <TablePanel>
+      <TableToolbar>
+        <Input
+          label="Search visitors"
+          hideLabel
+          type="search"
+          iconStart="search"
+          placeholder="Search by IP, city or country"
+        />
+        <Select label="Status" hideLabel options={statusFilter} value="all" onChange={() => {}} />
+        <Select label="Date range" hideLabel options={rangeFilter} value="30" onChange={() => {}} />
+        <ToolbarSpacer />
+        <Button variant="secondary" iconStart="download">Export CSV</Button>
+      </TableToolbar>
+
       <Table density={density}>
         <thead>
           <tr>
@@ -117,15 +151,7 @@ function VisitorTable({ density }: { density?: 'compact' | 'default' | 'comforta
               <tr key={row.ip} data-clickable="true" tabIndex={0}>
                 <Td label="Visitor">
                   <CellLead icon={<Pill tone={device.tone} icon={device.icon} label={device.label} />}>
-                    <CellStack
-                      primary={
-                        <span className="sb-identity">
-                          <span className="sb-ip">{row.ip}</span>
-                          <span className="sb-when">{row.seen}</span>
-                        </span>
-                      }
-                      meta={row.place}
-                    />
+                    <CellStack numeric primary={row.ip} aside={row.seen} meta={row.place} />
                   </CellLead>
                 </Td>
 
@@ -134,38 +160,33 @@ function VisitorTable({ density }: { density?: 'compact' | 'default' | 'comforta
                 </Td>
 
                 <Td label="Risk">
-                  <span className="sb-risk">
-                    <Progress
-                      layout="inline"
-                      value={row.risk}
-                      valueLabel={row.risk}
-                      tone={riskTone(row.risk)}
-                      ariaLabel={`Risk score ${row.risk} for ${row.ip}`}
-                    />
-                  </span>
+                  <Progress
+                    layout="inline"
+                    value={row.risk}
+                    valueLabel={row.risk}
+                    tone={riskTone(row.risk)}
+                    ariaLabel={`Risk score ${row.risk} for ${row.ip}`}
+                  />
                 </Td>
 
                 <Td label="Visits"><CellData>{row.visits}</CellData></Td>
                 <Td label="Paid clicks"><CellData>{row.paid}</CellData></Td>
 
                 <Td label="Click interval">
-                  <span className="sb-rhythm">
-                    <Dot tone={row.rhythm} />
-                    {row.interval}
-                  </span>
+                  <CellSignal tone={row.rhythm}>{row.interval}</CellSignal>
                 </Td>
 
                 <Td label="Converted">
-                  <span className="sb-converted" data-converted={row.converted}>
+                  <CellVerdict tone={row.converted ? 'success' : 'danger'}>
                     {row.converted ? 'Yes' : 'No'}
-                  </span>
+                  </CellVerdict>
                 </Td>
 
                 <Td label="Cost" align="end">
-                  <span className="sb-cost">
-                    <span className="sb-cost-value">{money(row.cost)}</span>
-                    {row.saved > 0 && <span className="sb-cost-saved">{money(row.saved)} saved</span>}
-                  </span>
+                  <CellMoney
+                    value={money(row.cost)}
+                    note={row.saved > 0 ? `${money(row.saved)} saved` : undefined}
+                  />
                 </Td>
 
                 <Td label="Actions" noLabel>
@@ -181,7 +202,7 @@ function VisitorTable({ density }: { density?: 'compact' | 'default' | 'comforta
 
       <TableFooter>
         <Button variant="secondary" disabled>Previous</Button>
-        <span className="sb-count">Showing 5 of 35 visitors</span>
+        <span>Showing 5 of 35 visitors</span>
         <Button variant="secondary">Next</Button>
       </TableFooter>
     </TablePanel>

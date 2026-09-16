@@ -315,7 +315,12 @@
   --table-row-height-default:     44px;
   --table-row-height-comfortable: 56px;
   --table-cell-padding-x:         var(--space-4);
-  --table-head-bg:                var(--surface-sunken);
+  /* The head sits on the card, not on a band of its own. Its rule and its
+     mono-uppercase label already separate it from the data; a grey fill on top
+     of those was a third signal doing the same job, and it boxed the table in
+     once the card gained a gutter. It stays opaque rather than transparent
+     because it is sticky — scrolling rows have to pass behind it, not through. */
+  --table-head-bg:                var(--surface-raised);
   --table-head-text:              var(--text-secondary);
   --table-border:                 var(--border-subtle);
 
@@ -329,6 +334,12 @@
   --progress-track:            var(--color-neutral-200);
   --progress-height:           var(--space-2);
   --progress-height-slim:      var(--space-1);
+
+  /* The inline bar lives in a shrink-to-content table cell, which would
+     otherwise collapse it to a stub. Floor it where "96 [====  ]" still reads,
+     and cap it so one column cannot sprawl across the row.                   */
+  --progress-inline-min:       var(--space-24);
+  --progress-inline-max:       var(--space-48);
   --progress-fill-default:     var(--color-indigo-500);
   --progress-fill-clean:       var(--status-success-icon);
   --progress-fill-suspicious:  var(--status-warning-icon);

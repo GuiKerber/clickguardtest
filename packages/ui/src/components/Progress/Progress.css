@@ -18,7 +18,21 @@
      space to claim inside a shrink-wrapping parent and collapses to zero. */
   width: 100%;
   flex: 1;
+  /* …and a shrink-to-content cell gives it no box at all, so the bar carries
+     its own floor and ceiling rather than leaving every caller to re-derive
+     them. */
+  min-width: var(--progress-inline-min);
+  max-width: var(--progress-inline-max);
   --progress-track-height: var(--progress-height-slim);
+}
+
+/* Stacked into a card, the cell is no longer the constraint — the bar takes the
+   share of the row it was given. */
+@media (max-width: 768px) {
+  .cg-progress--inline {
+    max-width: none;
+    flex: 0 1 55%;
+  }
 }
 
 .cg-progress--inline .cg-progress__value {

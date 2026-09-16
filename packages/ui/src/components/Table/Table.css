@@ -1,20 +1,27 @@
+/* The card holds its own gutter, so everything inside it — toolbar, table and
+   footer — sits on one inset edge instead of each part deciding its own. That
+   is why the parts below carry no horizontal padding of their own: two sources
+   of indentation is how a table ends up almost aligned. */
 .cg-table-panel {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  padding: var(--space-6);
   border: var(--border-width-thin) solid var(--border-subtle);
   border-radius: var(--radius-md);
   background-color: var(--surface-raised);
-  overflow: hidden;
 }
 
+/* Controls that act on the whole list live at the top of the card that holds
+   it. No rule under them: the gap already separates them from the table, and a
+   line there would read as a second header. */
 .cg-table-toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
-  border-bottom: var(--border-width-thin) solid var(--border-subtle);
+  padding: var(--space-0);
+  margin-block-end: var(--space-4);
 }
 
 .cg-table-toolbar__spacer { margin-inline-start: auto; }
@@ -119,11 +126,33 @@
   min-width: 0;
 }
 
+/* Primary and aside share a line and a baseline: the aside is a second fact
+   about the same thing, not a second thing. */
+.cg-cell-stack__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
 .cg-cell-stack__primary {
   color: var(--text-primary);
   font-size: var(--font-size-300);
   line-height: var(--line-height-300);
   font-weight: var(--font-weight-medium);
+}
+
+.cg-cell-stack__primary--numeric { font-variant-numeric: tabular-nums; }
+
+/* Same voice as the meta line below it: both are context, not content. Neither
+   takes a link colour — the whole row is the target, so blue would lie about
+   where the click goes. */
+.cg-cell-stack__aside {
+  color: var(--text-secondary);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
 }
 
 .cg-cell-stack__meta {
@@ -170,17 +199,74 @@
 
 .cg-cell-muted { color: var(--text-secondary); }
 
+/* Separated from the last row by a gap as well as a rule: pagination acts on
+   the list, so it must not read as one more row of it. */
 .cg-table-footer {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  margin-block-start: var(--space-4);
+  padding: var(--space-2) var(--space-0);
   border-top: var(--border-width-thin) solid var(--border-subtle);
   color: var(--text-secondary);
   font-size: var(--font-size-200);
   line-height: var(--line-height-200);
+}
+
+/* ---- Cell: money ----------------------------------------------------------- */
+
+.cg-cell-money {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-0);
+}
+
+.cg-cell-money__value {
+  font-size: var(--font-size-300);
+  line-height: var(--line-height-300);
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cg-cell-money__note {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cg-cell-money__note--success { color: var(--status-success-text); }
+.cg-cell-money__note--danger  { color: var(--status-danger-text); }
+.cg-cell-money__note--neutral { color: var(--text-secondary); }
+
+/* ---- Cell: verdict --------------------------------------------------------- */
+
+.cg-cell-verdict {
+  font-size: var(--font-size-300);
+  line-height: var(--line-height-300);
+  font-weight: var(--font-weight-medium);
+}
+
+.cg-cell-verdict--success { color: var(--status-success-text); }
+.cg-cell-verdict--danger  { color: var(--status-danger-text); }
+.cg-cell-verdict--neutral { color: var(--text-secondary); }
+
+/* ---- Cell: signal ---------------------------------------------------------- */
+
+.cg-cell-signal {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-primary);
+  font-size: var(--font-size-300);
+  line-height: var(--line-height-300);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
 }
 
 /* ---- Responsive -----------------------------------------------------------
@@ -239,6 +325,9 @@
 
   .cg-table--stack td[data-no-label='true']::before { content: none; }
 
-  .cg-table--stack .cg-progress,
-  .cg-table--stack .cg-rhythm { flex: 0 1 55%; }
+  /* A card has room the cell did not: the figure returns to the reading edge
+     and the sentence is allowed to wrap. */
+  .cg-table--stack .cg-cell-money { align-items: flex-start; }
+  .cg-table--stack .cg-cell-signal { white-space: normal; }
+  .cg-table--stack .cg-cell-stack__line { row-gap: var(--space-0); }
 }

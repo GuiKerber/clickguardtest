@@ -110,9 +110,17 @@ Lemon never carries state or meaning. One lemon button per view.
 
 ### Neutral
 
-`#FAFAFA` page → `#FFFFFF` card → `#F2F2F2` table head, with `#E1E1E1` dividers,
-`#C8C8C8` field borders, `#616064` secondary text, `#111553` primary text.
-Eight of eleven steps are sampled directly from the brand.
+`#FAFAFA` page → `#FFFFFF` card, with `#E1E1E1` dividers, `#C8C8C8` field
+borders, `#616064` secondary text, `#111553` primary text. `#F2F2F2` is the
+sunken tone, used for disabled fills. Eight of eleven steps are sampled directly
+from the brand.
+
+**The table head is white, not grey.** It was `#F2F2F2` for one round. Its rule
+and its mono-uppercase label already mark it as a header, so the fill was a
+third signal doing a job two signals had done — and once the card gained a
+gutter (§12), a grey band floating inside a white card read as a box within a
+box. It stays opaque white rather than transparent because the head is sticky:
+rows must pass behind it, not through it.
 
 ### Risk — classic severity, contrast-tested
 
@@ -302,6 +310,25 @@ an accessible name.
 The table carries nine columns: Visitor, Status, Risk, Visits, Paid clicks,
 Click interval, Converted, Cost, and a trailing actions column. Four of them sort.
 
+**The card owns the gutter, and the controls live inside it.** An earlier version
+put the filters above the card, on the reasoning that they act on the whole list
+rather than on the rows currently drawn. True, but it left them floating with no
+visible tie to the thing they change, and the table ran edge to edge inside a
+card that was only an outline. Now `TablePanel` carries one 24px gutter and
+everything inside it — toolbar, table, footer — sits on that single inset edge.
+The parts therefore carry no horizontal padding of their own: two sources of
+indentation is how a table ends up almost aligned.
+
+**Row modules, not screen CSS.** A row is assembled from exported parts —
+`CellStack` for the address and its timestamp, `CellSignal` for a finding with a
+coloured marker, `CellVerdict` for a one-word answer in a status colour,
+`CellMoney` for a figure with a second figure under it. These began as classes in
+the prototype's own stylesheet, which meant the screen's real composition lived
+somewhere Storybook could not reach: the documentation showed the pieces while
+the product showed an assembly nobody could review. Moving them into the system
+left the prototype with 40 lines of page furniture and let the Table story render
+the same nine columns the product ships.
+
 **Sort arrows appear on hover.** A column header is already a target; a permanent
 arrow on all nine is nine pieces of furniture competing with the data. The arrow
 fades in when you reach for the column, and the column actually sorting keeps its
@@ -392,11 +419,16 @@ writes rather than `Table`; fixing it properly means exporting `Tr`, `TBody` and
 `THead` and changing the call site. `Components/Table → Stacked` asserts today's
 behaviour so the regression is visible.
 
-**Eight exports the prototype does not use.** `Menu` (superseded by `MultiSelect`),
-`InfoTip` (header tooltips were dropped, see §12), `Skeleton` (the prototype ships
-with data, so no loading state is reachable), `TableToolbar` and `ToolbarSpacer`
-(the filters sit above the card rather than inside it). They are documented and
-tested; they are simply not on this screen.
+**Three exports the prototype never imports.** `Menu` (superseded by
+`MultiSelect`), `InfoTip` (header tooltips were dropped, see §12) and `Skeleton`
+(the prototype ships with data, so no loading state is reachable). They are
+documented and tested; they are simply not on this screen. `TableToolbar` and
+`ToolbarSpacer` left this list when the filters moved inside the card.
+
+`Dot` is also absent from the prototype's import list, but for the opposite
+reason: it is now used *inside* the system, by `CellSignal` and `Timeline`, so
+the screen gets it without naming it. An export the app reaches through another
+component is composition working, not a component going unused.
 
 **No `--radius-sm`.** A 16–20px checkbox at 8px radius reads almost circular. The
 component pass will either document a `--radius-sm: 4px` exception for controls

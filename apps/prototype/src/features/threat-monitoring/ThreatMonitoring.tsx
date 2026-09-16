@@ -4,8 +4,10 @@ import {
   CellActions,
   CellData,
   CellLead,
+  CellMoney,
+  CellSignal,
   CellStack,
-  Dot,
+  CellVerdict,
   EmptyState,
   Input,
   MultiSelect,
@@ -15,6 +17,8 @@ import {
   Table,
   TableFooter,
   TablePanel,
+  TableToolbar,
+  ToolbarSpacer,
   Td,
   Th,
   type SortDirection,
@@ -132,9 +136,11 @@ export function ThreatMonitoring() {
     <>
       <h1 className="tm__title">Threat Monitoring</h1>
 
-      {/* Filters sit above the card, not inside it: they act on the whole list,
-          not on the rows currently drawn. */}
-      <div className="tm__filters">
+      <TablePanel>
+        {/* Filters open the card they act on. They govern the whole list, so
+            they belong to the object that holds it rather than floating above
+            it with no visible tie to what they change. */}
+        <TableToolbar>
         <Input
           className="tm__search"
           label="Search visitors"
@@ -180,15 +186,14 @@ export function ThreatMonitoring() {
           </Button>
         )}
 
-        <span className="tm__filters-spacer" />
+        <ToolbarSpacer />
 
         <Button variant="secondary" iconStart="download">
           Export CSV
         </Button>
-      </div>
+      </TableToolbar>
 
-      <TablePanel>
-        {rows.length === 0 ? (
+      {rows.length === 0 ? (
           <EmptyState
             icon="search"
             title="No visitors match these filters"
@@ -334,12 +339,9 @@ function VisitorRow({
             The colour identifies the origin; it is not a verdict. */}
         <CellLead icon={<Pill tone={device.tone} icon={device.icon} label={device.label} />}>
           <CellStack
-            primary={
-              <span className="tm__identity">
-                <span className="tm__ip">{visitor.ip}</span>
-                <span className="tm__when">{formatRelative(metrics.lastSeen)}</span>
-              </span>
-            }
+            numeric
+            primary={visitor.ip}
+            aside={formatRelative(metrics.lastSeen)}
             meta={visitor.city + ', ' + visitor.country}
           />
         </CellLead>
@@ -361,15 +363,13 @@ function VisitorRow({
       </Td>
 
       <Td label="Risk">
-        <span className="tm__risk">
-          <Progress
-            layout="inline"
-            value={visitor.riskScore}
-            tone={riskTone(visitor.riskScore)}
-            valueLabel={visitor.riskScore}
-            ariaLabel={`Risk score ${visitor.riskScore}, ${visitor.riskBand}`}
-          />
-        </span>
+        <Progress
+          layout="inline"
+          value={visitor.riskScore}
+          tone={riskTone(visitor.riskScore)}
+          valueLabel={visitor.riskScore}
+          ariaLabel={`Risk score ${visitor.riskScore}, ${visitor.riskBand}`}
+        />
       </Td>
 
       <Td label="Visits">
@@ -383,27 +383,24 @@ function VisitorRow({
       </Td>
 
       <Td label="Click interval">
-        <span className="tm__rhythm">
-          <Dot tone={rhythm.tone} />
-          {rhythm.text}
-        </span>
+        <CellSignal tone={rhythm.tone}>{rhythm.text}</CellSignal>
       </Td>
 
       <Td label="Converted">
-        <span className="tm__converted" data-converted={converted}>
+        <CellVerdict tone={converted ? 'success' : 'danger'}>
           {converted ? 'Yes' : 'No'}
-        </span>
+        </CellVerdict>
       </Td>
 
       <Td label="Cost" align="end">
-        <span className="tm__cost">
-          <span className="tm__cost-value">
-            {metrics.wasted > 0 ? formatMoney(metrics.wasted) : '—'}
-          </span>
-          {visitor.savedSinceBlock > 0 && (
-            <span className="tm__cost-saved">{formatMoney(visitor.savedSinceBlock)} saved</span>
-          )}
-        </span>
+        <CellMoney
+          value={metrics.wasted > 0 ? formatMoney(metrics.wasted) : '—'}
+          note={
+            visitor.savedSinceBlock > 0
+              ? `${formatMoney(visitor.savedSinceBlock)} saved`
+              : undefined
+          }
+        />
       </Td>
 
       <Td label="Actions" noLabel>

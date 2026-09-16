@@ -1,5 +1,6 @@
 import type { ReactNode, TdHTMLAttributes, ThHTMLAttributes, HTMLAttributes } from 'react';
 import { Icon } from '../Icon/Icon';
+import { Dot, type DotTone } from '../Dot/Dot';
 import './Table.css';
 
 export type TableDensity = 'compact' | 'default' | 'comfortable';
@@ -117,11 +118,85 @@ export function Td({ align = 'start', label, noLabel, children, ...rest }: TdPro
 
 /* ---- Row modules ----------------------------------------------------------- */
 
-export function CellStack({ primary, meta }: { primary: ReactNode; meta?: ReactNode }) {
+export interface CellStackProps {
+  primary: ReactNode;
+  /**
+   * Sits beside the primary value in the quieter voice — a timestamp, a count.
+   * It shares the line rather than taking one of its own, because a third line
+   * would make every row in the table taller for a detail most rows ignore.
+   */
+  aside?: ReactNode;
+  meta?: ReactNode;
+  /** Aligns digits across rows. For identifiers and figures, not for prose. */
+  numeric?: boolean;
+}
+
+export function CellStack({ primary, aside, meta, numeric }: CellStackProps) {
   return (
     <span className="cg-cell-stack">
-      <span className="cg-cell-stack__primary">{primary}</span>
+      <span className="cg-cell-stack__line">
+        <span className={['cg-cell-stack__primary', numeric && 'cg-cell-stack__primary--numeric'].filter(Boolean).join(' ')}>
+          {primary}
+        </span>
+        {aside && <span className="cg-cell-stack__aside">{aside}</span>}
+      </span>
       {meta && <span className="cg-cell-stack__meta">{meta}</span>}
+    </span>
+  );
+}
+
+export interface CellMoneyProps {
+  value: ReactNode;
+  /** A second figure that qualifies the first — money recovered, for instance. */
+  note?: ReactNode;
+  /** Colours the note. The note still has to say what it means in words. */
+  noteTone?: 'success' | 'danger' | 'neutral';
+}
+
+/**
+ * A figure with an optional second figure beneath it. Two lines, never three:
+ * the note must not wrap away from the word that explains it.
+ */
+export function CellMoney({ value, note, noteTone = 'success' }: CellMoneyProps) {
+  return (
+    <span className="cg-cell-money">
+      <span className="cg-cell-money__value">{value}</span>
+      {note && <span className={`cg-cell-money__note cg-cell-money__note--${noteTone}`}>{note}</span>}
+    </span>
+  );
+}
+
+export interface CellVerdictProps {
+  tone: 'success' | 'danger' | 'neutral';
+  children: ReactNode;
+}
+
+/**
+ * A one-word answer carrying a status colour. The word is the answer; the
+ * colour only speeds up scanning, which is why there is no icon-less variant
+ * where the colour would be alone.
+ */
+export function CellVerdict({ tone, children }: CellVerdictProps) {
+  return <span className={`cg-cell-verdict cg-cell-verdict--${tone}`}>{children}</span>;
+}
+
+export interface CellSignalProps {
+  tone?: DotTone;
+  children: ReactNode;
+}
+
+/**
+ * A finding written as a sentence, with a coloured marker beside it.
+ *
+ * Where a measurement fits in words it is written in words — "96 clicks, one
+ * every 41s" — rather than drawn. A custom visualisation in a table cell buys a
+ * moment of delight and costs a permanent legend.
+ */
+export function CellSignal({ tone = 'neutral', children }: CellSignalProps) {
+  return (
+    <span className="cg-cell-signal">
+      <Dot tone={tone} />
+      {children}
     </span>
   );
 }

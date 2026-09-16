@@ -46,8 +46,21 @@ export {
   CellLead,
   CellActions,
   CellData,
+  CellMoney,
+  CellVerdict,
+  CellSignal,
 } from './components/Table/Table';
-export type { TableProps, ThProps, TdProps, TableDensity, SortDirection } from './components/Table/Table';
+export type {
+  TableProps,
+  ThProps,
+  TdProps,
+  TableDensity,
+  SortDirection,
+  CellStackProps,
+  CellMoneyProps,
+  CellVerdictProps,
+  CellSignalProps,
+} from './components/Table/Table';
 
 export { Drawer } from './components/Drawer/Drawer';
 export type { DrawerProps } from './components/Drawer/Drawer';
