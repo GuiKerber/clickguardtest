@@ -115,6 +115,7 @@ function VisitorTable({ density }: { density?: 'compact' | 'default' | 'comforta
     <TablePanel>
       <TableToolbar>
         <Input
+          grow
           label="Search visitors"
           hideLabel
           type="search"

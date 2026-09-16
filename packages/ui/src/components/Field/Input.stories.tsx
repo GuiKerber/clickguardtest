@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect } from 'storybook/test';
+import { Button } from '../Button/Button';
 import { Input } from './Input';
 
 const meta = {
@@ -27,6 +28,52 @@ export const Large: Story = { args: { size: 'lg', placeholder: 'Search IP or loc
 
 export const WithHelp: Story = {
   args: { help: 'Matches the address and the city, not the campaign name.' },
+};
+
+/**
+ * `grow` gives the field the spare width of its row, up to a cap — for the one
+ * control in a toolbar that deserves the slack. The cap matters: uncapped, this
+ * field would push the controls beside it to the far edge of a wide screen.
+ */
+export const Grow: Story = {
+  globals: { viewport: { value: 'wide' } },
+  render: (args) => (
+    <div style={{ display: 'flex', gap: 'var(--space-2)', width: 'var(--space-96)' }}>
+      <Input {...args} grow iconStart="search" placeholder="Search IP or location" />
+      <Button variant="secondary" iconStart="download">Export CSV</Button>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const field = canvasElement.querySelector('.cg-field--grow')!;
+    const button = canvasElement.querySelector('.cg-btn')!;
+    // It takes the slack, and leaves the control beside it on the same line.
+    await expect(field.getBoundingClientRect().width).toBeGreaterThan(
+      button.getBoundingClientRect().width,
+    );
+    await expect(Math.round(field.getBoundingClientRect().top)).toBe(
+      Math.round(button.getBoundingClientRect().top),
+    );
+  },
+};
+
+/** The cap holding: given far more room than it needs, it stops at the token. */
+export const GrowIsCapped: Story = {
+  // The cap only exists above the stack breakpoint, so the test has to say
+  // which layout it is testing rather than inherit the reader's pane width.
+  globals: { viewport: { value: 'wide' } },
+  render: (args) => (
+    <div style={{ width: 'calc(var(--space-96) * 2)' }}>
+      <Input {...args} grow iconStart="search" placeholder="Search IP or location" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const field = canvasElement.querySelector('.cg-field--grow')!;
+    // Read the cap rather than restate it: retuning the token must move this
+    // test with it, not break it.
+    const cap = parseFloat(getComputedStyle(field).maxWidth);
+    await expect(cap).toBeGreaterThan(0);
+    await expect(field.getBoundingClientRect().width).toBeLessThanOrEqual(cap);
+  },
 };
 
 export const Optional: Story = {

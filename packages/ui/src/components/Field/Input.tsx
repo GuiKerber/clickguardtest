@@ -17,10 +17,18 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   iconStart?: IconName;
   /** Renders a clear button; only shown while the field has a value. */
   onClear?: () => void;
+  /**
+   * Takes the spare width of the row it sits in, up to a cap.
+   *
+   * For the one field in a toolbar that deserves the slack — usually a search
+   * box. Capped rather than unbounded so the controls beside it stay next to it
+   * instead of drifting to the far edge.
+   */
+  grow?: boolean;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { size = 'md', label, hideLabel, optional, help, error, iconStart, onClear, id, className, value, ...rest },
+  { size = 'md', label, hideLabel, optional, help, error, iconStart, onClear, grow, id, className, value, ...rest },
   ref,
 ) {
   const autoId = useId();
@@ -32,6 +40,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     'cg-field',
     `cg-field--${size}`,
     iconStart && 'cg-field--icon-leading',
+    grow && 'cg-field--grow',
     showClear && 'cg-field--clearable',
     className,
   ]

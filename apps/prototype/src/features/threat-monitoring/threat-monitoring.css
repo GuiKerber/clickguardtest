@@ -1,9 +1,7 @@
 /* Page furniture only.
    The table, its toolbar, its footer and every module a row is made of come
-   from @clickguard/ui — including the layout of the card itself. What is left
-   here is the page heading and the two places this screen asks a shared
-   component to behave differently, both expressed as constraints rather than
-   as restyling. */
+   from @clickguard/ui — including the layout of the card and the width of the
+   search field. What is left is the page heading and one numeric alignment. */
 
 .tm__title {
   margin-block-end: var(--space-5);
@@ -14,19 +12,7 @@
   letter-spacing: var(--letter-spacing-tight);
 }
 
-/* The search field is the one control in the toolbar that should absorb spare
-   width — but not all of it, or the filters beside it drift to the far edge. */
-.tm__search {
-  flex: 1 1 var(--space-48);
-  min-width: 0;
-  max-width: var(--space-96);
-}
-
 .tm__count {
   font-variant-numeric: tabular-nums;
   text-align: center;
-}
-
-@media (max-width: 768px) {
-  .tm__search { max-width: none; }
 }

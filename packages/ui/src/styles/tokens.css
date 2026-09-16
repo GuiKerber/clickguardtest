@@ -227,6 +227,12 @@
   --field-help:         var(--color-neutral-600);
   --field-error-text:   var(--color-red-700);
 
+  /* A field marked `grow` starts here and stops there. The cap is the width a
+     full IPv6 address needs — the longest value the search box it was built
+     for will ever hold. */
+  --field-grow-basis: var(--space-48);
+  --field-grow-max:   var(--space-96);
+
   /* ---- Focus ------------------------------------------------------------- */
   /* Drawn inside the control's own box, not as a halo around it: a negative
      offset keeps the indicator part of the component instead of a second

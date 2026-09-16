@@ -319,6 +319,17 @@ everything inside it — toolbar, table, footer — sits on that single inset ed
 The parts therefore carry no horizontal padding of their own: two sources of
 indentation is how a table ends up almost aligned.
 
+**One field takes the slack.** `Input` has a `grow` prop: it absorbs the spare
+width of the row it sits in, up to `--field-grow-max`. The cap is the point, not
+the growth — uncapped, the search box would push every control beside it to the
+far edge of a wide toolbar, and the filters would stop reading as a group. The
+cap is set where a full IPv6 address still fits, which is the longest thing
+anyone types into the field this was built for.
+
+This began as a class in the prototype's stylesheet, which made the Storybook
+toolbar 164px narrower than the shipped one. A rule about how a control behaves
+in a row belongs to the control.
+
 **Row modules, not screen CSS.** A row is assembled from exported parts —
 `CellStack` for the address and its timestamp, `CellSignal` for a finding with a
 coloured marker, `CellVerdict` for a one-word answer in a status colour,

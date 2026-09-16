@@ -143,7 +143,7 @@ export function ThreatMonitoring() {
             it with no visible tie to what they change. */}
         <TableToolbar>
         <Input
-          className="tm__search"
+          grow
           label="Search visitors"
           hideLabel
           type="search"

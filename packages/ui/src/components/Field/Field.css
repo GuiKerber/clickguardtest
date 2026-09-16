@@ -24,6 +24,21 @@
   --field-pad-inline: var(--space-4);
 }
 
+/* Takes the spare width of its row, up to a cap. Uncapped, one field would push
+   every control beside it to the far edge of a wide toolbar; the cap is set
+   where a full IPv6 address still fits, which is the longest thing anyone
+   types into the field this was built for. */
+.cg-field--grow {
+  flex: 1 1 var(--field-grow-basis);
+  min-width: 0;
+  max-width: var(--field-grow-max);
+}
+
+/* Stacked, there is no spare width to take and no room to give away. */
+@media (max-width: 768px) {
+  .cg-field--grow { max-width: none; }
+}
+
 .cg-field__label {
   color: var(--field-label);
   font-size: var(--font-size-300);
