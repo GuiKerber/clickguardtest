@@ -1,0 +1,29 @@
+.cg-icon {
+  width: var(--icon-size-md);
+  height: var(--icon-size-md);
+  fill: none;
+  stroke-width: var(--icon-stroke-width);
+  color: currentColor;
+  flex-shrink: 0;
+}
+
+.cg-icon--sm { width: var(--icon-size-sm); height: var(--icon-size-sm); }
+.cg-icon--lg { width: var(--icon-size-lg); height: var(--icon-size-lg); }
+
+/* Motion is essential feedback here, so reduced-motion slows the rotation
+   rather than freezing it — a stopped spinner reads as a hung screen. */
+.cg-icon--spin {
+  animation: cg-spin var(--duration-loop) linear infinite;
+}
+
+@keyframes cg-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-icon--spin {
+    animation-duration: var(--duration-loop-reduced) !important;
+    animation-iteration-count: infinite !important;
+  }
+}

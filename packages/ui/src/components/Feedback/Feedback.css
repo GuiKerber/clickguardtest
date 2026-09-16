@@ -1,0 +1,157 @@
+/* ---- Callout -------------------------------------------------------------- */
+.cg-callout {
+  --callout-surface: var(--status-info-surface);
+  --callout-border: var(--status-info-border);
+  --callout-text: var(--status-info-text);
+  --callout-icon: var(--status-info-icon);
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--border-width-thin) solid var(--callout-border);
+  border-radius: var(--radius-md);
+  background-color: var(--callout-surface);
+  color: var(--callout-text);
+  font-size: var(--font-size-200);
+  line-height: var(--line-height-200);
+  font-weight: var(--font-weight-medium);
+}
+
+.cg-callout .cg-icon { color: var(--callout-icon); margin-block-start: var(--space-0); }
+
+.cg-callout--warning {
+  --callout-surface: var(--status-warning-surface);
+  --callout-border: var(--status-warning-border);
+  --callout-text: var(--status-warning-text);
+  --callout-icon: var(--status-warning-icon);
+}
+
+.cg-callout--danger {
+  --callout-surface: var(--status-danger-surface);
+  --callout-border: var(--status-danger-border);
+  --callout-text: var(--status-danger-text);
+  --callout-icon: var(--status-danger-icon);
+}
+
+.cg-callout--success {
+  --callout-surface: var(--status-success-surface);
+  --callout-border: var(--status-success-border);
+  --callout-text: var(--status-success-text);
+  --callout-icon: var(--status-success-icon);
+}
+
+.cg-callout__title {
+  display: block;
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ---- Empty state ---------------------------------------------------------- */
+.cg-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-16) var(--space-6);
+  text-align: center;
+}
+
+.cg-empty__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-12);
+  height: var(--space-12);
+  border-radius: var(--radius-full);
+  background-color: var(--surface-sunken);
+  color: var(--text-secondary);
+}
+
+.cg-empty__title {
+  color: var(--text-primary);
+  font-size: var(--font-size-400);
+  line-height: var(--line-height-400);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cg-empty__body {
+  max-width: 46ch;
+  color: var(--text-secondary);
+  font-size: var(--font-size-300);
+  line-height: var(--line-height-300);
+  font-weight: var(--font-weight-medium);
+}
+
+.cg-empty__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+/* ---- Skeleton -------------------------------------------------------------- */
+.cg-skeleton {
+  display: block;
+  height: var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--skeleton-base);
+  background-image: linear-gradient(
+    90deg,
+    var(--skeleton-base) 0%,
+    var(--skeleton-sheen) 50%,
+    var(--skeleton-base) 100%
+  );
+  background-size: 200% 100%;
+  animation: cg-sheen var(--duration-sheen) linear infinite;
+}
+
+@keyframes cg-sheen {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+/* ---- Stat card ------------------------------------------------------------- */
+.cg-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: var(--border-width-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-raised);
+  min-width: 0;
+}
+
+.cg-stat__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-secondary);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.cg-stat__value {
+  color: var(--text-primary);
+  font-size: var(--font-size-700);
+  line-height: var(--line-height-700);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-tight);
+  font-variant-numeric: tabular-nums;
+}
+
+.cg-stat__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-secondary);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+}
+
+.cg-stat--accent .cg-stat__value { color: var(--status-success-text); }

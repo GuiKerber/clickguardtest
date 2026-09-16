@@ -1,0 +1,128 @@
+/* Each variant sets local custom properties; the base class consumes them.
+   States (hover, disabled) redefine those locals, so no variant ever needs a
+   specificity fight or !important. */
+.cg-btn {
+  --btn-bg: transparent;
+  --btn-bg-hover: transparent;
+  --btn-bg-active: transparent;
+  --btn-border: transparent;
+  --btn-border-hover: transparent;
+  --btn-text: var(--text-primary);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--control-gap-md);
+  height: var(--control-height-md);
+  padding-inline: var(--control-padding-x-md);
+  border: var(--border-width-thin) solid var(--btn-border);
+  border-radius: var(--radius-full);
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-300);
+  line-height: var(--line-height-300);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard),
+    color var(--duration-fast) var(--easing-standard);
+}
+
+.cg-btn:not(:disabled):hover {
+  --btn-bg: var(--btn-bg-hover);
+  --btn-border: var(--btn-border-hover);
+  text-decoration: none;
+}
+
+.cg-btn:not(:disabled):active {
+  --btn-bg: var(--btn-bg-active);
+}
+
+.cg-btn--primary {
+  --btn-bg: var(--action-primary-bg);
+  --btn-bg-hover: var(--action-primary-bg-hover);
+  --btn-bg-active: var(--action-primary-bg-active);
+  --btn-border: var(--action-primary-border);
+  --btn-border-hover: var(--action-primary-border-hover);
+  --btn-text: var(--action-primary-text);
+}
+
+.cg-btn--secondary {
+  --btn-bg: var(--action-secondary-bg);
+  --btn-bg-hover: var(--action-secondary-bg-hover);
+  --btn-bg-active: var(--action-secondary-bg-active);
+  --btn-border: var(--action-secondary-border);
+  --btn-border-hover: var(--action-secondary-border);
+  --btn-text: var(--action-secondary-text);
+}
+
+.cg-btn--tertiary {
+  --btn-bg: var(--action-tertiary-bg);
+  --btn-bg-hover: var(--action-tertiary-bg-hover);
+  --btn-bg-active: var(--action-tertiary-bg-active);
+  --btn-text: var(--action-tertiary-text);
+}
+
+.cg-btn--danger {
+  --btn-bg: var(--action-danger-bg);
+  --btn-bg-hover: var(--action-danger-bg-hover);
+  --btn-bg-active: var(--action-danger-bg-hover);
+  --btn-border: var(--action-danger-border);
+  --btn-border-hover: var(--action-danger-bg-hover);
+  --btn-text: var(--action-danger-text);
+}
+
+.cg-btn--sm {
+  height: var(--control-height-sm);
+  padding-inline: var(--control-padding-x-sm);
+  gap: var(--control-gap-sm);
+  font-size: var(--font-size-200);
+  line-height: var(--line-height-200);
+}
+
+.cg-btn--lg {
+  height: var(--control-height-lg);
+  padding-inline: var(--control-padding-x-lg);
+  font-size: var(--font-size-400);
+  line-height: var(--line-height-400);
+}
+
+.cg-btn--icon {
+  padding-inline: var(--space-0);
+  width: var(--control-height-md);
+}
+
+.cg-btn--icon.cg-btn--sm { width: var(--control-height-sm); }
+.cg-btn--icon.cg-btn--lg { width: var(--control-height-lg); }
+
+.cg-btn:disabled,
+.cg-btn[aria-disabled='true'] {
+  --btn-bg: var(--action-disabled-bg);
+  --btn-border: var(--action-disabled-border);
+  --btn-text: var(--action-disabled-text);
+  cursor: not-allowed;
+}
+
+.cg-btn[data-loading='true'] { cursor: progress; }
+
+.cg-btn[data-loading='true'] .cg-btn__content { visibility: hidden; }
+
+.cg-btn__content {
+  display: inline-flex;
+  align-items: center;
+  gap: inherit;
+}
+
+.cg-btn__loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

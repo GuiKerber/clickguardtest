@@ -1,0 +1,20 @@
+{
+  "name": "clickguard-threat-monitoring",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@clickguard/prototype",
+    "build": "npm run build --workspace=@clickguard/prototype",
+    "preview": "npm run preview --workspace=@clickguard/prototype",
+    "typecheck": "tsc -b --pretty",
+    "storybook": "npm run storybook --workspace=@clickguard/ui",
+    "build-storybook": "npm run build-storybook --workspace=@clickguard/ui"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

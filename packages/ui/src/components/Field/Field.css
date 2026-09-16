@@ -1,0 +1,201 @@
+.cg-field {
+  --field-control-height: var(--control-height-md);
+  --field-font-size: var(--font-size-300);
+  --field-line-height: var(--line-height-300);
+  --field-pad-inline: var(--space-3);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.cg-field--sm {
+  --field-control-height: var(--control-height-sm);
+  --field-font-size: var(--font-size-200);
+  --field-line-height: var(--line-height-200);
+  --field-pad-inline: var(--space-2);
+}
+
+.cg-field--lg {
+  --field-control-height: var(--control-height-lg);
+  --field-font-size: var(--font-size-400);
+  --field-line-height: var(--line-height-400);
+  --field-pad-inline: var(--space-4);
+}
+
+.cg-field__label {
+  color: var(--field-label);
+  font-size: var(--font-size-300);
+  line-height: var(--line-height-200);
+  font-weight: var(--font-weight-medium);
+}
+
+.cg-field__optional {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-regular);
+}
+
+.cg-field__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cg-input,
+.cg-select {
+  width: 100%;
+  height: var(--field-control-height);
+  padding-inline: var(--field-pad-inline);
+  border: var(--border-width-thin) solid var(--field-border);
+  border-radius: var(--radius-md);
+  background-color: var(--field-bg);
+  color: var(--field-text);
+  font-family: var(--font-family-sans);
+  font-size: var(--field-font-size);
+  line-height: var(--field-line-height);
+  font-weight: var(--font-weight-medium);
+  min-width: 0;
+  transition:
+    border-color var(--duration-fast) var(--easing-standard),
+    background-color var(--duration-fast) var(--easing-standard);
+}
+
+.cg-input::placeholder { color: var(--field-placeholder); }
+
+.cg-input:hover:not(:disabled):not([readonly]),
+.cg-select:hover:not(:disabled) { border-color: var(--field-border-hover); }
+
+.cg-input:focus,
+.cg-select:focus { border-color: var(--field-border-focus); }
+
+.cg-input[aria-invalid='true'],
+.cg-select[aria-invalid='true'] { border-color: var(--field-border-error); }
+
+.cg-input:disabled,
+.cg-select:disabled {
+  background-color: var(--field-bg-disabled);
+  border-color: var(--action-disabled-border);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.cg-input[readonly] { background-color: var(--surface-sunken); }
+
+.cg-field__icon {
+  position: absolute;
+  inset-block: 0;
+  display: flex;
+  align-items: center;
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+.cg-field__icon--leading { inset-inline-start: var(--field-pad-inline); }
+
+.cg-field--icon-leading .cg-input {
+  padding-inline-start: calc(var(--field-pad-inline) + var(--icon-size-sm) + var(--space-2));
+}
+
+.cg-field--clearable .cg-input {
+  padding-inline-end: calc(var(--field-pad-inline) + var(--icon-size-md) + var(--space-2));
+}
+
+.cg-field__action {
+  position: absolute;
+  inset-inline-end: var(--space-1);
+  color: var(--text-secondary);
+}
+
+/* Custom listbox: the native control renders the operating system's own menu,
+   which the design system cannot reach. */
+.cg-select-root { width: 100%; }
+
+.cg-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  text-align: start;
+  cursor: pointer;
+}
+
+.cg-select:disabled { cursor: not-allowed; }
+
+.cg-select[data-placeholder='true'] .cg-select__value { color: var(--field-placeholder); }
+
+.cg-select[aria-expanded='true'] { border-color: var(--field-border-focus); }
+
+.cg-select__value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cg-select__chevron {
+  color: var(--text-secondary);
+  /* transform, not the standalone rotate property: on an SVG element rotate is
+     also a presentation attribute, and the CSS property is ignored. */
+  transform-origin: center;
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.cg-select[aria-expanded='true'] .cg-select__chevron { transform: rotate(180deg); }
+
+.cg-select__list {
+  position: absolute;
+  z-index: var(--layer-dropdown);
+  inset-block-start: calc(100% + var(--space-1));
+  inset-inline: 0;
+  max-height: var(--space-96);
+  overflow-y: auto;
+  padding: var(--space-1);
+  border: var(--border-width-thin) solid var(--overlay-border);
+  border-radius: var(--radius-md);
+  background-color: var(--overlay-bg);
+}
+
+.cg-select__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--control-height-sm);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  background-color: transparent;
+  color: var(--text-primary);
+  font-size: var(--field-font-size);
+  line-height: var(--field-line-height);
+  font-weight: var(--font-weight-medium);
+  text-align: start;
+}
+
+/* Keyboard and pointer share one highlight, so arrowing down looks the same as
+   hovering — two different highlights in one list is a puzzle, not a menu. */
+.cg-select__option[data-active='true'] { background-color: var(--surface-hover); }
+
+.cg-select__option[aria-selected='true'] {
+  background-color: var(--surface-selected);
+  color: var(--text-primary);
+}
+
+.cg-select__option .cg-icon { color: var(--status-info-icon); }
+
+.cg-field__help {
+  color: var(--field-help);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+}
+
+.cg-field__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  color: var(--field-error-text);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+}

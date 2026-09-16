@@ -1,0 +1,41 @@
+.cg-tip-root {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.cg-tip-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  border-radius: var(--radius-full);
+  transition: color var(--duration-fast) var(--easing-standard);
+}
+
+.cg-tip-trigger:hover { color: var(--text-link); }
+
+.cg-tip {
+  position: absolute;
+  z-index: var(--layer-tooltip);
+  inset-block-end: calc(100% + var(--space-2));
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  width: max-content;
+  max-width: var(--overlay-tip-width);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-inverse);
+  color: var(--text-inverse);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+  text-align: start;
+  white-space: normal;
+}
+
+.cg-tip--end {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+  translate: none;
+}

@@ -1,0 +1,78 @@
+/* A segmented arc. The segments do the same job as a bar, but a dial reads as a
+   position on a scale rather than a quantity — which is what a risk score is. */
+.cg-gauge {
+  position: relative;
+  width: 100%;
+  max-width: var(--gauge-max-width);
+  margin-inline: auto;
+}
+
+.cg-gauge__arc {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.cg-gauge__segment { fill: var(--progress-track); }
+
+/* Each leg of the gradient names the two tokens it runs between; the component
+   supplies only its position along that leg. The colours stay in the token
+   layer and never reach the markup. */
+.cg-gauge__segment--g1 {
+  --gauge-from: var(--gauge-band-low);
+  --gauge-to: var(--gauge-band-rising);
+}
+
+.cg-gauge__segment--g2 {
+  --gauge-from: var(--gauge-band-rising);
+  --gauge-to: var(--gauge-band-high);
+}
+
+.cg-gauge__segment--g3 {
+  --gauge-from: var(--gauge-band-high);
+  --gauge-to: var(--gauge-band-critical);
+}
+
+/* Fallback first: the leg's end colour, so a segment is never unpainted. */
+.cg-gauge__segment--on { fill: var(--gauge-to); }
+
+@supports (color: color-mix(in oklab, red, blue 50%)) {
+  .cg-gauge__segment--on {
+    fill: color-mix(in oklab, var(--gauge-from), var(--gauge-to) calc(var(--gauge-mix) * 100%));
+  }
+}
+
+.cg-gauge__center {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 4%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-0);
+}
+
+.cg-gauge__value {
+  color: var(--text-primary);
+  font-size: var(--font-size-900);
+  line-height: var(--line-height-900);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-tight);
+  font-variant-numeric: tabular-nums;
+}
+
+.cg-gauge__label {
+  color: var(--text-secondary);
+  font-size: var(--font-size-300);
+  line-height: var(--line-height-300);
+  font-weight: var(--font-weight-medium);
+}
+
+.cg-gauge__caption {
+  margin-block-start: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+}

@@ -1,0 +1,109 @@
+/* Non-modal by design: the table stays visible and clickable behind it, so the
+   user can jump straight to another visitor without closing anything. That is
+   why there is no scrim and no focus trap on desktop. */
+.cg-drawer {
+  position: fixed;
+  inset-block: var(--space-2);
+  inset-inline-end: var(--space-2);
+  z-index: var(--layer-panel);
+  display: flex;
+  flex-direction: column;
+  width: min(var(--overlay-drawer-width), calc(100vw - var(--space-4)));
+  border: var(--border-width-thin) solid var(--overlay-border);
+  border-radius: var(--radius-md);
+  background-color: var(--overlay-bg);
+  overflow: hidden;
+  animation: cg-drawer-in var(--duration-base) var(--easing-standard);
+}
+
+/* Opacity only. A transform in an entrance animation decides where the panel
+   ends up, so a frozen or skipped animation — a throttled tab, a paused
+   compositor — would strand it off-position. Fading cannot do that. */
+@keyframes cg-drawer-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-drawer { animation: none; }
+}
+
+.cg-drawer__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border-bottom: var(--border-width-thin) solid var(--border-subtle);
+}
+
+.cg-drawer__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-block-end: var(--space-2);
+}
+
+.cg-drawer__badge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.cg-drawer__title {
+  color: var(--text-primary);
+  font-size: var(--font-size-500);
+  line-height: var(--line-height-500);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+  overflow-wrap: anywhere;
+}
+
+.cg-drawer__subtitle {
+  color: var(--text-secondary);
+  font-size: var(--font-size-200);
+  line-height: var(--line-height-200);
+  font-weight: var(--font-weight-medium);
+}
+
+.cg-drawer__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.cg-drawer__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-top: var(--border-width-thin) solid var(--border-subtle);
+  background-color: var(--surface-raised);
+}
+
+/* Below the stack breakpoint the table is not visible anyway, so the panel
+   becomes a full sheet and earns a scrim. */
+@media (max-width: 768px) {
+  .cg-drawer {
+    inset: var(--space-2);
+    width: auto;
+  }
+
+  .cg-drawer-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: var(--layer-scrim);
+    background-color: var(--surface-scrim);
+  }
+}
+
+@media (min-width: 769px) {
+  .cg-drawer-scrim { display: none; }
+}

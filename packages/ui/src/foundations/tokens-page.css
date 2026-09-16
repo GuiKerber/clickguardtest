@@ -1,0 +1,94 @@
+/* Chrome for the foundations page. It documents the system, so it is held to
+   the same rule as the system: no value here is written by hand either. */
+
+.tk {
+  padding: var(--space-6);
+  background-color: var(--surface-page);
+}
+
+.tk__note {
+  margin-block-end: var(--space-6);
+  color: var(--text-secondary);
+  font-size: var(--font-size-200);
+  line-height: var(--line-height-200);
+}
+
+.tk__note code {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-100);
+}
+
+.tk__group + .tk__group { margin-block-start: var(--space-8); }
+
+.tk__group-title {
+  margin-block-end: var(--space-3);
+  color: var(--text-secondary);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.tk__list {
+  display: grid;
+  gap: var(--border-width-thin);
+  margin: 0;
+  padding: 0;
+  border: var(--border-width-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background-color: var(--border-subtle);
+  list-style: none;
+  overflow: hidden;
+}
+
+.tk__row {
+  display: grid;
+  grid-template-columns: var(--space-10) minmax(0, var(--space-96)) minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--surface-raised);
+}
+
+.tk__swatch {
+  width: var(--space-10);
+  height: var(--space-6);
+  border: var(--border-width-thin) solid var(--border-subtle);
+  border-radius: var(--radius-none);
+}
+
+.tk__swatch--empty {
+  display: flex;
+  align-items: center;
+  border-style: dashed;
+  background-color: var(--surface-sunken);
+}
+
+.tk__bar {
+  height: var(--space-2);
+  background-color: var(--border-accent);
+}
+
+.tk__name,
+.tk__declared,
+.tk__resolved {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  overflow-wrap: anywhere;
+}
+
+.tk__name { color: var(--text-primary); }
+.tk__declared { color: var(--text-secondary); }
+.tk__resolved { color: var(--text-tertiary); }
+
+@media (max-width: 768px) {
+  .tk__row {
+    grid-template-columns: var(--space-10) minmax(0, 1fr);
+  }
+
+  .tk__declared,
+  .tk__resolved { grid-column: 2; }
+}

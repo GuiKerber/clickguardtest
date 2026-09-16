@@ -1,0 +1,70 @@
+.cg-progress {
+  --progress-fill: var(--progress-fill-default);
+  --progress-track-height: var(--progress-height);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+/* Row layout: the number reads first, the bar takes the rest. Slimmer, because
+   a table row has no vertical space to spare. */
+.cg-progress--inline {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+  /* Fill the box it is given. Without this the track's `flex: 1` has no free
+     space to claim inside a shrink-wrapping parent and collapses to zero. */
+  width: 100%;
+  flex: 1;
+  --progress-track-height: var(--progress-height-slim);
+}
+
+.cg-progress--inline .cg-progress__value {
+  flex: none;
+  min-width: var(--space-5);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-300);
+  line-height: var(--line-height-300);
+  font-weight: var(--font-weight-medium);
+  text-align: end;
+}
+
+.cg-progress--inline .cg-progress__track { flex: 1; }
+
+.cg-progress__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+}
+
+.cg-progress__value {
+  color: var(--text-primary);
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.cg-progress__track {
+  width: 100%;
+  height: var(--progress-track-height);
+  border-radius: var(--radius-full);
+  background-color: var(--progress-track);
+  overflow: hidden;
+}
+
+.cg-progress__fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background-color: var(--progress-fill);
+  transition: width var(--duration-slow) var(--easing-standard);
+}
+
+.cg-progress--clean { --progress-fill: var(--progress-fill-clean); }
+.cg-progress--suspicious { --progress-fill: var(--progress-fill-suspicious); }
+.cg-progress--malicious { --progress-fill: var(--progress-fill-malicious); }

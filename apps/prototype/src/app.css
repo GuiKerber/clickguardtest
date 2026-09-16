@@ -1,0 +1,23 @@
+/* App shell. Layout only — every value resolves to a design-system token. */
+
+.app {
+  /* Wide enough for nine columns of evidence, and no wider: in an auto-layout
+     table every spare pixel is handed to the one growing column, so slack here
+     turns straight into a bloated Visitor column. */
+  --app-shell-max: 1440px;
+
+  min-height: 100vh;
+  padding-block: var(--space-8) var(--space-12);
+}
+
+.app__shell {
+  width: 100%;
+  max-width: var(--app-shell-max);
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+}
+
+@media (max-width: 768px) {
+  .app { padding-block: var(--space-5) var(--space-8); }
+  .app__shell { padding-inline: var(--space-4); }
+}

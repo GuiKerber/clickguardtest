@@ -1,0 +1,70 @@
+.cg-menu-root {
+  position: relative;
+  display: inline-flex;
+}
+
+/* No shadow token exists in this system, so a floating layer earns its
+   separation from a stronger border than a resting surface uses. */
+.cg-menu {
+  position: absolute;
+  z-index: var(--layer-dropdown);
+  inset-block-start: calc(100% + var(--space-1));
+  inset-inline-start: 0;
+  min-width: var(--space-16);
+  padding: var(--space-1);
+  border: var(--border-width-thin) solid var(--overlay-border);
+  border-radius: var(--radius-md);
+  background-color: var(--overlay-bg);
+}
+
+.cg-menu--end {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+}
+
+.cg-menu__label {
+  display: block;
+  padding: var(--space-1) var(--space-2);
+  color: var(--text-secondary);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.cg-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--control-height-sm);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  background-color: transparent;
+  color: var(--text-primary);
+  font-size: var(--font-size-300);
+  line-height: var(--line-height-300);
+  font-weight: var(--font-weight-medium);
+  text-align: start;
+  white-space: nowrap;
+  transition: background-color var(--duration-fast) var(--easing-standard);
+}
+
+.cg-menu__item:hover { background-color: var(--surface-hover); }
+
+.cg-menu__item[aria-checked='true'] { background-color: var(--surface-selected); }
+
+.cg-menu__check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-size-sm);
+  color: var(--status-info-icon);
+}
+
+.cg-menu__separator {
+  height: var(--border-width-thin);
+  margin: var(--space-1) var(--space-0);
+  background-color: var(--border-subtle);
+}

@@ -1,0 +1,95 @@
+.cg-pill {
+  --pill-surface: var(--status-neutral-surface);
+  --pill-border: var(--status-neutral-border);
+  --pill-text: var(--status-neutral-text);
+  --pill-icon: var(--status-neutral-icon);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width-thin) solid var(--pill-border);
+  border-radius: var(--radius-md);
+  background-color: var(--pill-surface);
+  color: var(--pill-text);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.cg-pill .cg-icon { color: var(--pill-icon); }
+
+.cg-pill--sm { padding: var(--space-0) var(--space-1); }
+
+/* System rule: a pill carrying only an icon is fully rounded. With no word
+   inside, an 8px corner reads as a clipped tag rather than a marker. */
+.cg-pill--icon-only {
+  padding: var(--space-1);
+  border-radius: var(--radius-full);
+}
+
+.cg-pill--icon-only.cg-pill--sm { padding: var(--space-0); }
+
+.cg-pill--success {
+  --pill-surface: var(--status-success-surface);
+  --pill-border: var(--status-success-border);
+  --pill-text: var(--status-success-text);
+  --pill-icon: var(--status-success-icon);
+}
+
+.cg-pill--warning {
+  --pill-surface: var(--status-warning-surface);
+  --pill-border: var(--status-warning-border);
+  --pill-text: var(--status-warning-text);
+  --pill-icon: var(--status-warning-icon);
+}
+
+.cg-pill--danger {
+  --pill-surface: var(--status-danger-surface);
+  --pill-border: var(--status-danger-border);
+  --pill-text: var(--status-danger-text);
+  --pill-icon: var(--status-danger-icon);
+}
+
+.cg-pill--info {
+  --pill-surface: var(--status-info-surface);
+  --pill-border: var(--status-info-border);
+  --pill-text: var(--status-info-text);
+  --pill-icon: var(--status-info-icon);
+}
+
+.cg-pill--clean {
+  --pill-surface: var(--risk-clean-surface);
+  --pill-border: var(--risk-clean-border);
+  --pill-text: var(--risk-clean-text);
+  --pill-icon: var(--risk-clean-icon);
+}
+
+.cg-pill--suspicious {
+  --pill-surface: var(--risk-suspicious-surface);
+  --pill-border: var(--risk-suspicious-border);
+  --pill-text: var(--risk-suspicious-text);
+  --pill-icon: var(--risk-suspicious-icon);
+}
+
+.cg-pill--malicious {
+  --pill-surface: var(--risk-malicious-surface);
+  --pill-border: var(--risk-malicious-border);
+  --pill-text: var(--risk-malicious-text);
+  --pill-icon: var(--risk-malicious-icon);
+}
+
+.cg-pill--monitoring {
+  --pill-surface: var(--risk-monitoring-surface);
+  --pill-border: var(--risk-monitoring-border);
+  --pill-text: var(--risk-monitoring-text);
+  --pill-icon: var(--risk-monitoring-icon);
+}
+
+.cg-pill--blocked {
+  --pill-surface: var(--risk-blocked-surface);
+  --pill-border: var(--risk-blocked-border);
+  --pill-text: var(--risk-blocked-text);
+  --pill-icon: var(--risk-blocked-icon);
+}

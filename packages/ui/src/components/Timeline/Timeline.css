@@ -1,0 +1,97 @@
+/* A running ledger, not a list of verdicts. Each entry states what it added to
+   the total, so the decision is watched being built rather than announced. */
+.cg-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.cg-timeline__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--space-2) 1fr;
+  gap: var(--space-3);
+  padding-block: var(--space-2);
+}
+
+/* The rail, drawn behind the markers. */
+.cg-timeline__item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  inset-block: var(--space-6) calc(var(--space-2) * -1);
+  inset-inline-start: calc(var(--space-1) - (var(--border-width-thin) / 2));
+  width: var(--border-width-thin);
+  background-color: var(--border-subtle);
+}
+
+.cg-timeline__marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--line-height-300);
+}
+
+.cg-timeline__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0);
+  min-width: 0;
+}
+
+.cg-timeline__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-primary);
+  font-size: var(--font-size-300);
+  line-height: var(--line-height-300);
+  font-weight: var(--font-weight-medium);
+}
+
+.cg-timeline__meta {
+  color: var(--text-secondary);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+}
+
+.cg-timeline__reason {
+  margin-block-start: var(--space-1);
+  color: var(--text-secondary);
+  font-size: var(--font-size-200);
+  line-height: var(--line-height-200);
+}
+
+/* The score line sits with the entry it belongs to and says what it is. A bare
+   "+14" floating in a right-hand column explains nothing. */
+.cg-timeline__score {
+  margin-block-start: var(--space-1);
+  color: var(--text-primary);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sits inside the entry that caused it, not as a banner across the list. */
+.cg-timeline__tag-slot {
+  display: flex;
+  margin-block-start: var(--space-2);
+}
+
+.cg-timeline__threshold-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width-thin) solid var(--risk-blocked-border);
+  border-radius: var(--radius-md);
+  background-color: var(--risk-blocked-surface);
+  color: var(--risk-blocked-text);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+}
+
+.cg-timeline__threshold-tag .cg-icon { color: var(--risk-blocked-icon); }
+
