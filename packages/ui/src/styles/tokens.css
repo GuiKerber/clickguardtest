@@ -362,6 +362,22 @@
   --gauge-guide-width: 2;
   --gauge-guide-step:  5;
 
+  /* ---- Sparkline ----------------------------------------------------------
+     A shape, not a reading. The line carries the tone at full strength and the
+     fill fades out beneath it, so the chart reads as texture next to a figure
+     rather than competing with it for the eye.                               */
+  --sparkline-default:   var(--text-tertiary);
+  --sparkline-success:   var(--status-success-icon);
+  --sparkline-danger:    var(--status-danger-icon);
+  --sparkline-stroke-width: 1.5;
+  --sparkline-fill-from: 0.18;
+  --sparkline-fill-to:   0;
+
+  /* The slot a stat card gives a chart. Small on purpose: it is read as a
+     glance, and a bigger box would ask to be measured. */
+  --stat-chart-width:  var(--space-16);
+  --stat-chart-height: var(--space-8);
+
   /* ---- Skeleton (loading placeholder) ------------------------------------- */
   --skeleton-base:  var(--color-neutral-100);
   --skeleton-sheen: var(--color-neutral-200);

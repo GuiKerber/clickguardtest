@@ -34,6 +34,9 @@ export type { GaugeProps } from './components/Gauge/Gauge';
 export { Progress } from './components/Progress/Progress';
 export type { ProgressProps, ProgressTone, ProgressLayout } from './components/Progress/Progress';
 
+export { Sparkline } from './components/Sparkline/Sparkline';
+export type { SparklineProps, SparklineTone } from './components/Sparkline/Sparkline';
+
 export {
   Table,
   TablePanel,

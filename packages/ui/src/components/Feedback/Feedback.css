@@ -135,13 +135,37 @@
   text-transform: uppercase;
 }
 
+.cg-stat__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
 .cg-stat__value {
+  min-width: 0;
   color: var(--text-primary);
   font-size: var(--font-size-700);
   line-height: var(--line-height-700);
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--letter-spacing-tight);
   font-variant-numeric: tabular-nums;
+  /* A money figure has no spaces to break at, so this only fires when the
+     alternative is the number leaving the card. Wrapped is ugly; clipped is
+     wrong — a figure the reader cannot finish reading is worse than a tall
+     card. The chart gives up its width first. */
+  overflow-wrap: anywhere;
+}
+
+/* Allowed to shrink, never to grow: the chart gives up width to a long figure
+   rather than the other way round, because the figure is the answer and the
+   chart is the aside. */
+.cg-stat__chart {
+  display: block;
+  flex: 0 1 var(--stat-chart-width);
+  min-width: 0;
+  height: var(--stat-chart-height);
 }
 
 .cg-stat__meta {

@@ -76,6 +76,106 @@ export function hasConverted(visitor: Visitor) {
   return visitor.visits.some((visit) => visit.conversion);
 }
 
+/* ---- Money over time -------------------------------------------------------
+   Both curves below are derived, never authored. The figure printed on a card
+   is the last point of its own series, so the number and the shape can never
+   disagree — the same rule the risk-score ledger follows.
+   -------------------------------------------------------------------------- */
+
+const SERIES_POINTS = 24;
+
+/** Cumulative paid spend, sampled evenly across the visitor's whole history. */
+export function spendSeries(visitor: Visitor): number[] {
+  const paid = visitor.visits.filter((visit) => isPaid(visit.source));
+  if (paid.length === 0) return [];
+
+  const start = paid[0].at;
+  const end = Math.max(NOW, paid[paid.length - 1].at);
+  const span = end - start || 1;
+
+  return Array.from({ length: SERIES_POINTS }, (_, index) => {
+    const at = start + (span * index) / (SERIES_POINTS - 1);
+    return paid.reduce((total, visit) => (visit.at <= at ? total + visit.cost : total), 0);
+  });
+}
+
+/**
+ * What the exclusion has saved so far.
+ *
+ * There is no meter for money that was never spent, so this is a projection and
+ * is treated as one: take the rate at which this address actually produced paid
+ * clicks before it was blocked, and the average price of those clicks, then run
+ * that forward over the time it has been excluded.
+ *
+ * The rate is measured across the visitor's active span — first paid click to
+ * the block — rather than across its tightest burst. A click farm's 41-second
+ * cadence describes one burst, not a week, and projecting the burst rate
+ * forward would claim thousands of clicks that were never coming.
+ */
+interface Projection {
+  /** Average time between paid clicks before the block. */
+  interval: number;
+  /** Average price of those clicks. */
+  meanCost: number;
+  /** Whole clicks avoided since the block. You cannot avoid a third of a click. */
+  clicks: number;
+}
+
+function projectionOf(visitor: Visitor): Projection | null {
+  if (!visitor.blockedAt) return null;
+
+  const paidBefore = visitor.visits.filter(
+    (visit) => isPaid(visit.source) && visit.at < visitor.blockedAt!,
+  );
+  if (paidBefore.length < 2) return null;
+
+  const span = visitor.blockedAt - paidBefore[0].at;
+  if (span <= 0) return null;
+
+  const spent = paidBefore.reduce((total, visit) => total + visit.cost, 0);
+  const interval = span / paidBefore.length;
+
+  /* The projection runs for at most as long as the behaviour was observed.
+     Without this, an address watched for six hours and excluded five days ago
+     is credited with five days of clicks it was never seen sustaining — one
+     visitor here claimed £9,190 saved against £450 actually spent, which is
+     the sort of number that makes a reader distrust the other nine.
+
+     The cap is deliberately conservative: it can never claim the block saved
+     more than the address had already cost, so the figure understates rather
+     than sells. */
+  const projected = Math.min(NOW - visitor.blockedAt, span);
+
+  return {
+    interval,
+    meanCost: spent / paidBefore.length,
+    clicks: Math.floor(projected / interval),
+  };
+}
+
+export function savedOf(visitor: Visitor): number {
+  const projection = projectionOf(visitor);
+  return projection ? projection.clicks * projection.meanCost : 0;
+}
+
+/**
+ * The same projection, drawn at its own granularity: one step per click the
+ * exclusion prevented. A smooth ramp would imply money saved continuously,
+ * which is not what the model says — clicks arrive one at a time, and the
+ * saving happens when each one does not.
+ */
+export function savedSeries(visitor: Visitor): number[] {
+  const projection = projectionOf(visitor);
+  if (!projection || projection.clicks < 1) return [];
+
+  const elapsed = NOW - visitor.blockedAt!;
+
+  return Array.from({ length: SERIES_POINTS }, (_, index) => {
+    const at = (elapsed * index) / (SERIES_POINTS - 1);
+    return Math.min(projection.clicks, Math.floor(at / projection.interval)) * projection.meanCost;
+  });
+}
+
 function formatGap(ms: number) {
   const seconds = Math.round(ms / 1000);
   if (seconds < 90) return `${seconds}s`;

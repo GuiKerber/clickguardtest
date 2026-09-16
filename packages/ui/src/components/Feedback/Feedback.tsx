@@ -69,13 +69,25 @@ export interface StatCardProps {
   meta?: ReactNode;
   /** Lifts the number into the success tone — for money the product saved. */
   accent?: boolean;
+  /**
+   * Sits beside the value, at a fixed size. Meant for a sparkline: a shape that
+   * says how the figure was reached, never a second figure.
+   */
+  chart?: ReactNode;
 }
 
-export function StatCard({ label, value, meta, accent }: StatCardProps) {
+export function StatCard({ label, value, meta, accent, chart }: StatCardProps) {
   return (
     <div className={['cg-stat', accent && 'cg-stat--accent'].filter(Boolean).join(' ')}>
       <span className="cg-stat__label">{label}</span>
-      <span className="cg-stat__value">{value}</span>
+
+      {/* The figure keeps the reading edge and the chart takes what is left, so
+          a longer number narrows the drawing instead of pushing it out. */}
+      <span className="cg-stat__row">
+        <span className="cg-stat__value">{value}</span>
+        {chart && <span className="cg-stat__chart">{chart}</span>}
+      </span>
+
       {meta && <span className="cg-stat__meta">{meta}</span>}
     </div>
   );

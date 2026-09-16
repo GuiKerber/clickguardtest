@@ -1,0 +1,27 @@
+/* The chart is sized by its container, not by itself: it sits in whatever slot
+   it is given and stretches to fill it. `preserveAspectRatio: none` means the
+   drawing distorts with the box, which is correct here — the shape is the
+   message, the proportions are not. */
+.cg-sparkline {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: var(--sparkline-default);
+  overflow: visible;
+}
+
+.cg-sparkline--success { color: var(--sparkline-success); }
+.cg-sparkline--danger  { color: var(--sparkline-danger); }
+
+.cg-sparkline__line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--sparkline-stroke-width);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* The viewBox is stretched to the container, so a plain stroke-width would
+     be stretched with it and read thicker on wide boxes than on tall ones. */
+  vector-effect: non-scaling-stroke;
+}
+
+.cg-sparkline__area { stroke: none; }

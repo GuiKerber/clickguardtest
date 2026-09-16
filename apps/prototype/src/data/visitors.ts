@@ -139,7 +139,6 @@ const clickFarm: Visitor = {
   platform: 'Meta Ads',
   blockedAt: NOW - 18 * HOUR,
   syncState: 'synced',
-  savedSinceBlock: 214.4,
   signals: clickFarmSignals,
   visits: buildVisits([
     {
@@ -236,7 +235,6 @@ const vpnRotator: Visitor = {
   platform: 'Google Ads',
   blockedAt: NOW - 2 * DAY,
   syncState: 'synced',
-  savedSinceBlock: 168.2,
   signals: [
     {
       label: 'Network type',
@@ -301,7 +299,6 @@ const ambiguous: Visitor = {
   confidence: 'low',
   headline: 'Six paid clicks with almost no engagement — but it filled in a form',
   platform: 'Google Ads',
-  savedSinceBlock: 0,
   signals: [
     {
       label: 'Form fill',
@@ -366,7 +363,6 @@ const sharedCarrier: Visitor = {
   confidence: 'low',
   headline: 'Mobile carrier address — this number may cover thousands of real people',
   platform: 'Google Ads',
-  savedSinceBlock: 0,
   signals: [
     {
       label: 'Shared address',
@@ -418,7 +414,6 @@ const loyalCustomer: Visitor = {
   confidence: 'high',
   headline: 'Researched over two weeks, then bought',
   platform: 'Google Ads',
-  savedSinceBlock: 0,
   signals: [
     { label: 'Conversion', value: '1 purchase on 14 Sep — $1,180', verdict: 'exonerating', explain: 'Real money changed hands.' },
     { label: 'Engagement', value: 'Median 3m 20s across 9 visits', verdict: 'exonerating', explain: 'This visitor read the pages properly.' },
@@ -447,7 +442,6 @@ const crawler: Visitor = {
   confidence: 'high',
   headline: 'Verified search engine crawler — costs nothing, blocks nothing',
   platform: '—',
-  savedSinceBlock: 0,
   signals: [
     {
       label: 'Identity',
@@ -486,16 +480,15 @@ interface FillerSpec {
   sharedIp?: boolean;
   blockedAgoHours?: number;
   syncState?: Visitor['syncState'];
-  savedSinceBlock?: number;
   network: string;
   converted?: boolean;
 }
 
 const fillerSpecs: FillerSpec[] = [
-  { ip: '103.152.220.18', city: 'Jakarta', country: 'Indonesia', device: 'server', status: 'blocked', score: 89, visits: 64, paid: 58, costPer: 4.1, intervalHours: 0.05, headline: '58 paid clicks at a fixed 3-minute interval', platform: 'Google Ads', blockedAgoHours: 40, syncState: 'synced', savedSinceBlock: 122.3, network: 'Datacentre — DigitalOcean (AS14061)' },
-  { ip: '5.188.62.140', city: 'Moscow', country: 'Russia', device: 'server', status: 'blocked', score: 94, visits: 77, paid: 71, costPer: 5.8, intervalHours: 0.08, headline: 'Automation framework detected on every one of 71 paid clicks', platform: 'Google Ads', blockedAgoHours: 6, syncState: 'syncing', savedSinceBlock: 46.4, network: 'Datacentre — Selectel (AS49505)' },
+  { ip: '103.152.220.18', city: 'Jakarta', country: 'Indonesia', device: 'server', status: 'blocked', score: 89, visits: 64, paid: 58, costPer: 4.1, intervalHours: 0.05, headline: '58 paid clicks at a fixed 3-minute interval', platform: 'Google Ads', blockedAgoHours: 40, syncState: 'synced', network: 'Datacentre — DigitalOcean (AS14061)' },
+  { ip: '5.188.62.140', city: 'Moscow', country: 'Russia', device: 'server', status: 'blocked', score: 94, visits: 77, paid: 71, costPer: 5.8, intervalHours: 0.08, headline: 'Automation framework detected on every one of 71 paid clicks', platform: 'Google Ads', blockedAgoHours: 6, syncState: 'syncing', network: 'Datacentre — Selectel (AS49505)' },
   { ip: '154.16.105.77', city: 'Lagos', country: 'Nigeria', device: 'desktop', status: 'monitoring', score: 57, visits: 41, paid: 38, costPer: 3.4, intervalHours: 0.3, headline: 'Device fingerprint seen on 9 addresses in one afternoon', platform: 'Meta Ads', network: 'Proxy — residential proxy pool' },
-  { ip: '92.118.160.41', city: 'Frankfurt', country: 'Germany', device: 'server', status: 'blocked', score: 91, visits: 53, paid: 49, costPer: 9.2, intervalHours: 0.12, headline: 'Datacentre address, zero engagement across 49 paid clicks', platform: 'Google Ads', blockedAgoHours: 120, syncState: 'synced', savedSinceBlock: 302.1, network: 'Datacentre — Hetzner (AS24940)' },
+  { ip: '92.118.160.41', city: 'Frankfurt', country: 'Germany', device: 'server', status: 'blocked', score: 91, visits: 53, paid: 49, costPer: 9.2, intervalHours: 0.12, headline: 'Datacentre address, zero engagement across 49 paid clicks', platform: 'Google Ads', blockedAgoHours: 120, syncState: 'synced', network: 'Datacentre — Hetzner (AS24940)' },
   { ip: '190.2.148.63', city: 'Buenos Aires', country: 'Argentina', device: 'desktop', status: 'monitoring', score: 67, visits: 19, paid: 14, costPer: 4.7, intervalHours: 4, headline: 'Clicks cluster in tight bursts, then go quiet for days', platform: 'Google Ads', network: 'Residential — Telecom Argentina (AS7303)' },
   { ip: '41.210.14.92', city: 'Nairobi', country: 'Kenya', device: 'mobile', status: 'monitoring', score: 58, visits: 11, paid: 9, costPer: 2.3, intervalHours: 9, headline: 'Short visits, but a residential mobile network', platform: 'Meta Ads', sharedIp: true, network: 'Mobile carrier NAT — Safaricom (AS33771)' },
   { ip: '213.55.99.180', city: 'Warsaw', country: 'Poland', device: 'desktop', status: 'monitoring', score: 52, visits: 8, paid: 7, costPer: 11.4, intervalHours: 14, headline: 'Repeat clicks on one expensive keyword, no engagement', platform: 'Google Ads', network: 'Residential — Orange Polska (AS5617)' },
@@ -537,6 +530,27 @@ function buildFiller(spec: FillerSpec, index: number): Visitor {
 
   const lastPaidIndex = spec.paid - 1;
 
+  /* An exclusion is the end of the paid series, not a label on top of it. Once
+     the address is on the platform's list it is never shown another ad, so paid
+     clicks run up to the block and stop there. Unpaid arrivals carry on: what
+     was removed is the advertising, not the person. Anchoring both to `now`
+     instead — as this generator first did — produced blocked addresses whose
+     every paid click landed after the block. */
+  const blockedAgo = spec.blockedAgoHours ? spec.blockedAgoHours * HOUR : 0;
+  const unpaidCount = spec.visits - spec.paid;
+  const unpaidWindow = blockedAgo > 0 ? blockedAgo : unpaidCount * intervalMs;
+
+  function agoFor(index: number) {
+    if (index < spec.paid) {
+      const fromEnd = spec.paid - index;
+      return Math.round(blockedAgo + fromEnd * intervalMs + (random() - 0.5) * jitterMs);
+    }
+
+    // Spread evenly across whatever window follows the last paid click.
+    const step = index - spec.paid + 1;
+    return Math.round((unpaidWindow * (unpaidCount - step + 1)) / (unpaidCount + 1));
+  }
+
   const specs: VisitSpec[] = Array.from({ length: spec.visits }, (_, i) => {
     const isPaid = i < spec.paid;
     const source: TrafficSource = isPaid
@@ -546,7 +560,7 @@ function buildFiller(spec: FillerSpec, index: number): Visitor {
       : ['organic', 'direct', 'referral'][i % 3] as TrafficSource;
 
     return {
-      ago: Math.round((spec.visits - i) * intervalMs + (random() - 0.5) * jitterMs),
+      ago: agoFor(i),
       source,
       cost: isPaid ? spec.costPer : 0,
       engagementSeconds: engaged ? Math.round(60 + random() * 300) : Math.round(random() * 12),
@@ -578,7 +592,6 @@ function buildFiller(spec: FillerSpec, index: number): Visitor {
     platform: spec.platform,
     blockedAt: spec.blockedAgoHours ? NOW - spec.blockedAgoHours * HOUR : undefined,
     syncState: spec.syncState,
-    savedSinceBlock: spec.savedSinceBlock ?? 0,
     signals: [
       {
         label: 'Network type',

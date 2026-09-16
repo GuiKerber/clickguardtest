@@ -34,6 +34,7 @@ import {
   metricsOf,
   rhythmOf,
   riskTone,
+  savedOf,
   statusMeta,
 } from '../../data/derive';
 import { VisitorDrawer } from './VisitorDrawer';
@@ -319,6 +320,7 @@ function VisitorRow({
   const status = statusMeta[visitor.status];
   const device = deviceMeta[visitor.device];
   const converted = hasConverted(visitor);
+  const saved = savedOf(visitor);
   const unsure = visitor.confidence === 'low' && visitor.status === 'monitoring';
 
   return (
@@ -395,11 +397,7 @@ function VisitorRow({
       <Td label="Cost" align="end">
         <CellMoney
           value={metrics.wasted > 0 ? formatMoney(metrics.wasted) : '—'}
-          note={
-            visitor.savedSinceBlock > 0
-              ? `${formatMoney(visitor.savedSinceBlock)} saved`
-              : undefined
-          }
+          note={saved > 0 ? `${formatMoney(saved)} saved` : undefined}
         />
       </Td>
 

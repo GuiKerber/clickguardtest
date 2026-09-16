@@ -379,6 +379,39 @@ the arc available at its own radius makes the gap identical all the way through.
 deliberate and safe: a gauge segment is decorative fill, and the score it
 describes is printed in the middle of the dial in `--text-primary`.
 
+**The score card reads label → figure → verdict.** "Risk score" sits above the
+number and the status pill below it: what this figure is, what it says, and what
+was done about it. The pill left the panel header when it moved here, so the
+address and the close button share the top line instead of the panel opening
+with two competing first things to read. A dotted guide traced just inside the
+segments keeps the dial legible where nothing is lit — without it a low score
+reads as a broken arc rather than a low one.
+
+**Sparklines are derived, not decorative.** Each stat card can carry a small
+chart beside its figure. It answers one question — did this climb steadily, in
+bursts, or not at all — and deliberately cannot answer any other: no axis, no
+grid, no labels, because a 64-pixel drawing that invites measurement is a lie.
+
+*Wasted* is the real thing: cumulative paid spend across the visitor's history,
+ending exactly on the figure printed beside it.
+
+*Saved* has no meter — there is no record of money that was never spent — so it
+is a projection, and is treated as one. Take the rate at which the address
+actually produced paid clicks before the block and the average price of those
+clicks, then run that forward over the time it has been excluded, stepping once
+per click prevented. Two rules keep it honest. The rate is measured across the
+visitor's active span rather than its tightest burst, because a click farm's
+41-second cadence describes one burst and not a week. And the projection runs
+for at most as long as the behaviour was observed: an address watched for six
+hours and excluded five days ago would otherwise be credited with five days of
+clicks nobody saw it sustain — one visitor here claimed $9,190 saved against
+$450 actually spent before that cap existed. The figure now understates rather
+than sells, and can never exceed what the address had already cost.
+
+This replaced a hand-authored `savedSinceBlock` field, which has been deleted:
+a number with no series behind it cannot be drawn, and a number the screen
+cannot derive is a number the screen cannot defend.
+
 **Native `<select>` was replaced.** The operating system renders its own menu —
 different typeface, different highlight colour, different corner radius on every
 machine. That is one control the design system cannot reach, sitting in the middle
@@ -429,6 +462,14 @@ documented and tested; they are simply not on this screen. `TableToolbar` and
 reason: it is now used *inside* the system, by `CellSignal` and `Timeline`, so
 the screen gets it without naming it. An export the app reaches through another
 component is composition working, not a component going unused.
+
+**One visitor still receives paid clicks after its block.** `89.187.162.44` is a
+hand-built case and keeps two of them deliberately, to exercise the syncing
+state — an exclusion is not live the moment it is decided, and the platform can
+serve an ad in the gap. Every generated visitor now stops earning paid clicks at
+the block, which it did not before: the generator anchored each series to *now*
+regardless of `blockedAt`, so blocked addresses carried entire histories dated
+after their own exclusion. The saving projection is what surfaced it.
 
 **No `--radius-sm`.** A 16–20px checkbox at 8px radius reads almost circular. The
 component pass will either document a `--radius-sm: 4px` exception for controls

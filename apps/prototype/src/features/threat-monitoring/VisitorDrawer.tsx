@@ -5,6 +5,7 @@ import {
   Drawer,
   Gauge,
   Pill,
+  Sparkline,
   StatCard,
   Timeline,
   TimelineItem,
@@ -23,7 +24,10 @@ import {
   isPaid,
   metricsOf,
   riskTone,
+  savedOf,
+  savedSeries,
   sourceMeta,
+  spendSeries,
   statusMeta,
 } from '../../data/derive';
 import './visitor-drawer.css';
@@ -106,6 +110,9 @@ export interface VisitorDrawerProps {
 export function VisitorDrawer({ visitor, onClose }: VisitorDrawerProps) {
   const metrics = useMemo(() => metricsOf(visitor), [visitor]);
   const ledger = useMemo(() => buildLedger(visitor), [visitor]);
+  const spend = useMemo(() => spendSeries(visitor), [visitor]);
+  const savedCurve = useMemo(() => savedSeries(visitor), [visitor]);
+  const saved = savedOf(visitor);
   const status = statusMeta[visitor.status];
   const unsure = visitor.confidence === 'low' && visitor.status === 'monitoring';
 
@@ -169,12 +176,28 @@ export function VisitorDrawer({ visitor, onClose }: VisitorDrawerProps) {
               label="Wasted"
               value={formatMoney(metrics.wasted)}
               meta={`${metrics.paidVisits} paid clicks`}
+              chart={
+                <Sparkline
+                  points={spend}
+                  tone="danger"
+                  ariaLabel={`Spend on this visitor rose to ${formatMoney(metrics.wasted)} over ${metrics.paidVisits} paid clicks.`}
+                />
+              }
             />
             <StatCard
-              accent={visitor.savedSinceBlock > 0}
+              accent={saved > 0}
               label="Saved"
-              value={visitor.savedSinceBlock > 0 ? formatMoney(visitor.savedSinceBlock) : '—'}
-              meta={visitor.savedSinceBlock > 0 ? 'No ads shown since' : 'Not blocked yet'}
+              value={saved > 0 ? formatMoney(saved) : '—'}
+              meta={saved > 0 ? 'No ads shown since' : 'Not blocked yet'}
+              chart={
+                savedCurve.length > 0 ? (
+                  <Sparkline
+                    points={savedCurve}
+                    tone="success"
+                    ariaLabel={`Projected saving since the block, reaching ${formatMoney(saved)}.`}
+                  />
+                ) : undefined
+              }
             />
           </div>
 

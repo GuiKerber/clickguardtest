@@ -51,7 +51,6 @@ export interface Visitor {
   blockedAt?: number;
   /** An exclusion is not live the moment we decide it — the ad platform has to accept it. */
   syncState?: 'synced' | 'syncing';
-  savedSinceBlock: number;
   signals: Signal[];
   visits: Visit[];
 }
