@@ -15,6 +15,16 @@
 
 .cg-gauge__segment { fill: var(--progress-track); }
 
+/* Dots, not a line: a solid ring would read as a second track competing with
+   the segments for the same meaning. */
+.cg-gauge__guide {
+  fill: none;
+  stroke: var(--gauge-guide);
+  stroke-width: var(--gauge-guide-width);
+  stroke-linecap: round;
+  stroke-dasharray: 0 var(--gauge-guide-step);
+}
+
 /* Each leg of the gradient names the two tokens it runs between; the component
    supplies only its position along that leg. The colours stay in the token
    layer and never reach the markup. */
@@ -42,10 +52,13 @@
   }
 }
 
+/* Anchored to the foot of the dial rather than centred in it: the stack grows
+   upward from a fixed baseline, so adding or dropping the badge cannot shift
+   the number that everything else is arranged around. */
 .cg-gauge__center {
   position: absolute;
   inset-inline: 0;
-  inset-block-end: 4%;
+  inset-block-end: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -66,6 +79,11 @@
   font-size: var(--font-size-300);
   line-height: var(--line-height-300);
   font-weight: var(--font-weight-medium);
+}
+
+.cg-gauge__badge {
+  display: flex;
+  margin-block-start: var(--space-1);
 }
 
 .cg-gauge__caption {

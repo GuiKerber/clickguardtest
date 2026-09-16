@@ -356,6 +356,12 @@
   --gauge-band-high:     var(--status-warning-text);
   --gauge-band-critical: var(--status-danger-icon);
 
+  /* The dotted guide traced inside the segments. Quieter than the unlit track,
+     because it is the scale itself rather than a value not yet reached. */
+  --gauge-guide:       var(--color-neutral-300);
+  --gauge-guide-width: 2;
+  --gauge-guide-step:  5;
+
   /* ---- Skeleton (loading placeholder) ------------------------------------- */
   --skeleton-base:  var(--color-neutral-100);
   --skeleton-sheen: var(--color-neutral-200);

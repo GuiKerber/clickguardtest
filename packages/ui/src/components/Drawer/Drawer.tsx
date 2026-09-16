@@ -41,18 +41,23 @@ export function Drawer({ open, onClose, title, subtitle, badge, footer, children
         aria-labelledby={titleId}
         tabIndex={-1}
       >
+        {/* Title and close button share the top line, so the record's name sits
+            on the same baseline as the only control that dismisses it. The
+            verdict is not here: it belongs beside the score that produced it,
+            and repeating it in the header made the panel open with two
+            competing first things to read. */}
         <header className="cg-drawer__header">
-          {/* The verdict shares the top line with the close button: it is the
-              first thing to read, and it needs no heading to introduce it. */}
           <div className="cg-drawer__top">
-            <span className="cg-drawer__badge">{badge}</span>
+            <div className="cg-drawer__heading">
+              <h2 className="cg-drawer__title" id={titleId}>
+                {title}
+              </h2>
+              {subtitle && <p className="cg-drawer__subtitle">{subtitle}</p>}
+            </div>
+
+            {badge && <span className="cg-drawer__badge">{badge}</span>}
             <Button variant="tertiary" iconStart="cancel" aria-label="Close panel" onClick={onClose} />
           </div>
-
-          <h2 className="cg-drawer__title" id={titleId}>
-            {title}
-          </h2>
-          {subtitle && <p className="cg-drawer__subtitle">{subtitle}</p>}
         </header>
 
         <div className="cg-drawer__body">{children}</div>

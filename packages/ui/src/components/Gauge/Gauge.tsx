@@ -4,8 +4,10 @@ import './Gauge.css';
 export interface GaugeProps {
   value: number;
   max?: number;
-  /** Sits under the number, inside the arc. */
+  /** Sits above the number: what the figure is, read before the figure itself. */
   label?: ReactNode;
+  /** Sits under the number, inside the arc. Use it for the verdict the score led to. */
+  badge?: ReactNode;
   /** Sits under the whole dial. */
   caption?: ReactNode;
   /** Announced to assistive tech, which cannot see the dial. */
@@ -23,6 +25,11 @@ const INNER_R = 79;
 /** The space between two neighbouring segments, identical at every radius. */
 const GAP = 2.5;
 const CORNER_R = 3;
+
+/* A dotted arc traced just inside the segments. It carries no value — it is the
+   scale the segments sit on, drawn so the dial still reads as a dial in the
+   stretch where every segment is unlit. */
+const GUIDE_R = 73;
 
 type Point = [number, number];
 
@@ -74,7 +81,7 @@ const LEGS = ['g1', 'g2', 'g3'] as const;
  * flat sample of a green → yellow → brown → red gradient at its own position,
  * so a full dial reads as a journey from safe to fatal.
  */
-export function Gauge({ value, max = 100, label, caption, ariaLabel, segments = 24 }: GaugeProps) {
+export function Gauge({ value, max = 100, label, badge, caption, ariaLabel, segments = 24 }: GaugeProps) {
   const clamped = Math.max(0, Math.min(value, max));
   const filled = Math.round((clamped / max) * segments);
 
@@ -98,6 +105,11 @@ export function Gauge({ value, max = 100, label, caption, ariaLabel, segments = 
   return (
     <div className="cg-gauge">
       <svg className="cg-gauge__arc" viewBox="0 0 200 107" role="img" aria-label={ariaLabel}>
+        <path
+          className="cg-gauge__guide"
+          d={`M ${CX - GUIDE_R} ${CY} A ${GUIDE_R} ${GUIDE_R} 0 0 1 ${CX + GUIDE_R} ${CY}`}
+        />
+
         {Array.from({ length: segments }, (_, index) => {
           const position = index / (segments - 1);
           const leg = Math.min(LEGS.length - 1, Math.floor(position * LEGS.length));
@@ -122,9 +134,12 @@ export function Gauge({ value, max = 100, label, caption, ariaLabel, segments = 
         })}
       </svg>
 
+      {/* Label, then figure, then verdict — the order the reader needs them:
+          what this number is, what it says, and what was done about it. */}
       <div className="cg-gauge__center">
-        <span className="cg-gauge__value">{clamped}</span>
         {label && <span className="cg-gauge__label">{label}</span>}
+        <span className="cg-gauge__value">{clamped}</span>
+        {badge && <span className="cg-gauge__badge">{badge}</span>}
       </div>
 
       {caption && <p className="cg-gauge__caption">{caption}</p>}

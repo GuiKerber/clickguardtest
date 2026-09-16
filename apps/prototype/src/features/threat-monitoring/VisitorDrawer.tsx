@@ -114,17 +114,6 @@ export function VisitorDrawer({ visitor, onClose }: VisitorDrawerProps) {
       open
       onClose={onClose}
       title={visitor.ip}
-      badge={
-        unsure ? (
-          <Pill tone="warning" icon="alert-circle">
-            Not certain
-          </Pill>
-        ) : (
-          <Pill tone={status.tone} icon={status.icon}>
-            {status.label}
-          </Pill>
-        )
-      }
       subtitle={
         <>
           {visitor.city}, {visitor.country} · {metrics.totalVisits} visits · {metrics.paidVisits} paid
@@ -156,9 +145,22 @@ export function VisitorDrawer({ visitor, onClose }: VisitorDrawerProps) {
       {/* ---- 1. Where this visitor stands ---- */}
       <section className="vd__section">
         <div className="vd__score-card">
+          {/* The verdict sits under the score that produced it, so the two are
+              read as one statement rather than as a heading and a fact. */}
           <Gauge
             value={visitor.riskScore}
-            label="risk score"
+            label="Risk score"
+            badge={
+              unsure ? (
+                <Pill tone="warning" icon="alert-circle">
+                  Not certain
+                </Pill>
+              ) : (
+                <Pill tone={status.tone} icon={status.icon}>
+                  {status.label}
+                </Pill>
+              )
+            }
             ariaLabel={`Risk score ${visitor.riskScore} out of 100. Addresses are blocked at ${BLOCK_THRESHOLD}.`}
           />
 

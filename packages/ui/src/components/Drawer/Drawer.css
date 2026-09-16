@@ -31,17 +31,24 @@
 .cg-drawer__header {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
   padding: var(--space-4);
   border-bottom: var(--border-width-thin) solid var(--border-subtle);
 }
 
+/* Start, not centre: the close button lines up with the first line of the
+   heading, so it holds its place whether or not a subtitle is present. */
 .cg-drawer__top {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-start;
   gap: var(--space-3);
-  margin-block-end: var(--space-2);
+}
+
+.cg-drawer__heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  margin-inline-end: auto;
 }
 
 .cg-drawer__badge {
