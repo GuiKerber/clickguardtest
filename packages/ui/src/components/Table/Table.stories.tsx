@@ -26,40 +26,58 @@ import { Pill } from '../Pill/Pill';
 import { Select } from '../Field/Select';
 import { Progress } from '../Progress/Progress';
 
-/* The same nine columns Threat Monitoring ships, assembled from the same parts.
+/* The same ten columns Threat Monitoring ships, assembled from the same parts.
    A story that shows a simpler table than the product is a story that stops
    catching the product's problems. */
 
 const rows = [
   {
     ip: '45.132.19.204', place: 'Hanoi, Vietnam', seen: '3h ago',
-    device: 'server' as const, status: 'blocked' as const,
-    risk: 96, visits: 98, paid: 96, interval: '96 clicks, one every 41s', rhythm: 'danger' as const,
+    device: 'server' as const, status: 'blocked' as const, unsure: false,
+    risk: 96, bot: 'very-high' as const,
+    visits: 98, paid: 96, interval: '96 clicks, one every 41s', rhythm: 'danger' as const,
     converted: false, cost: 739.2, saved: 214.4,
   },
   {
     ip: '92.118.160.41', place: 'Frankfurt, Germany', seen: '7 min ago',
-    device: 'desktop' as const, status: 'blocked' as const,
-    risk: 91, visits: 53, paid: 49, interval: '49 clicks, one every 7m', rhythm: 'danger' as const,
+    device: 'desktop' as const, status: 'blocked' as const, unsure: false,
+    risk: 91, bot: 'high' as const,
+    visits: 53, paid: 49, interval: '49 clicks, one every 7m', rhythm: 'danger' as const,
     converted: false, cost: 450.8, saved: 302.1,
   },
   {
     ip: '62.210.87.116', place: 'Paris, France', seen: '12 min ago',
-    device: 'server' as const, status: 'monitoring' as const,
-    risk: 74, visits: 35, paid: 33, interval: '33 clicks, one every 12m', rhythm: 'danger' as const,
+    device: 'server' as const, status: 'monitoring' as const, unsure: false,
+    risk: 74, bot: 'high' as const,
+    visits: 35, paid: 33, interval: '33 clicks, one every 12m', rhythm: 'danger' as const,
     converted: false, cost: 415.8, saved: 0,
   },
   {
+    /* The uncertain case: watched precisely because the evidence points both
+       ways. It prints "Not certain" instead of "Monitoring", which is why the
+       filter above has to offer both words. */
     ip: '82.66.14.9', place: 'Lyon, France', seen: '1h ago',
-    device: 'mobile' as const, status: 'monitoring' as const,
-    risk: 52, visits: 19, paid: 11, interval: '11 clicks in tight runs', rhythm: 'warning' as const,
+    device: 'mobile' as const, status: 'monitoring' as const, unsure: true,
+    risk: 52, bot: 'medium' as const,
+    visits: 19, paid: 11, interval: '11 clicks in tight runs', rhythm: 'warning' as const,
     converted: false, cost: 88.4, saved: 0,
   },
   {
-    ip: '177.54.203.18', place: 'São Paulo, Brazil', seen: '26 min ago',
-    device: 'mobile' as const, status: 'clean' as const,
-    risk: 8, visits: 6, paid: 3, interval: '3 clicks, uneven gaps', rhythm: 'neutral' as const,
+    ip: '177.54.203.18', place: 'Sao Paulo, Brazil', seen: '26 min ago',
+    device: 'mobile' as const, status: 'clean' as const, unsure: false,
+    risk: 8, bot: 'very-low' as const,
+    visits: 6, paid: 3, interval: '3 clicks, no pattern yet', rhythm: 'success' as const,
     converted: true, cost: 12.6, saved: 0,
+  },
+  {
+    /* A crawler: no risk at all and still plainly a machine. It is the row that
+       proves Bot and Risk are two questions rather than one column drawn twice,
+       and the only one where grey is the right colour for the cadence. */
+    ip: '66.249.66.1', place: 'Mountain View, United States', seen: '2h ago',
+    device: 'crawler' as const, status: 'clean' as const, unsure: false,
+    risk: 2, bot: 'very-high' as const,
+    visits: 14, paid: 0, interval: 'No paid clicks', rhythm: 'neutral' as const,
+    converted: false, cost: 0, saved: 0,
   },
 ];
 
@@ -67,6 +85,7 @@ const deviceMeta = {
   server: { icon: 'server', tone: 'warning', label: 'Datacentre server, not a home connection' },
   desktop: { icon: 'computer', tone: 'info', label: 'Desktop, home or office network' },
   mobile: { icon: 'device', tone: 'success', label: 'Mobile device' },
+  crawler: { icon: 'robot', tone: 'neutral', label: 'Verified search engine crawler' },
 } as const;
 
 const statusMeta = {
@@ -75,9 +94,23 @@ const statusMeta = {
   clean: { label: 'Clean', tone: 'clean', icon: 'shield-check' },
 } as const;
 
-const statusFilter = [
+const botMeta = {
+  'very-low': { label: 'Very low', tone: 'clean' },
+  low: { label: 'Low', tone: 'clean' },
+  medium: { label: 'Medium', tone: 'suspicious' },
+  high: { label: 'High', tone: 'malicious' },
+  'very-high': { label: 'Very high', tone: 'malicious' },
+} as const;
+
+/* The filter offers what the Status column prints, not what the data model
+   stores — "Not certain" is a low-confidence monitored address, but it is the
+   word on the row, so it has to be the word in the list. */
+type StatusFilter = 'all' | 'blocked' | 'not-certain' | 'monitoring' | 'clean';
+
+const statusFilter: { value: StatusFilter; label: string }[] = [
   { value: 'all', label: 'All statuses' },
   { value: 'blocked', label: 'Blocked' },
+  { value: 'not-certain', label: 'Not certain' },
   { value: 'monitoring', label: 'Monitoring' },
   { value: 'clean', label: 'Clean' },
 ];
@@ -88,6 +121,13 @@ const rangeFilter = [
   { value: '90', label: 'Last 90 days' },
 ];
 
+function matches(row: (typeof rows)[number], filter: StatusFilter) {
+  if (filter === 'all') return true;
+  if (filter === 'not-certain') return row.unsure;
+  if (filter === 'monitoring') return row.status === 'monitoring' && !row.unsure;
+  return row.status === filter;
+}
+
 const riskTone = (score: number) => (score >= 85 ? 'malicious' : score >= 45 ? 'suspicious' : 'clean');
 const money = (value: number) => value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 
@@ -96,11 +136,14 @@ type SortKey = 'risk' | 'visits' | 'paid' | 'cost';
 function VisitorTable({ density }: { density?: 'compact' | 'default' | 'comfortable' }) {
   const [sortKey, setSortKey] = useState<SortKey>('risk');
   const [direction, setDirection] = useState<SortDirection>('descending');
+  const [filter, setFilter] = useState<StatusFilter>('all');
 
-  const sorted = [...rows].sort((a, b) => {
-    const delta = a[sortKey] - b[sortKey];
-    return direction === 'descending' ? -delta : delta;
-  });
+  const sorted = rows
+    .filter((row) => matches(row, filter))
+    .sort((a, b) => {
+      const delta = a[sortKey] - b[sortKey];
+      return direction === 'descending' ? -delta : delta;
+    });
 
   const sortProps = (key: SortKey) => ({
     sortable: true,
@@ -122,18 +165,51 @@ function VisitorTable({ density }: { density?: 'compact' | 'default' | 'comforta
           iconStart="search"
           placeholder="Search by IP, city or country"
         />
-        <Select label="Status" hideLabel options={statusFilter} value="all" onChange={() => {}} />
+        <Select
+          label="Status"
+          hideLabel
+          options={statusFilter}
+          value={filter}
+          onChange={(next) => setFilter(next as StatusFilter)}
+        />
         <Select label="Date range" hideLabel options={rangeFilter} value="30" onChange={() => {}} />
+        {filter !== 'all' && (
+          <Button variant="tertiary" iconStart="cancel" onClick={() => setFilter('all')}>
+            Clear filters
+          </Button>
+        )}
         <ToolbarSpacer />
         <Button variant="secondary" iconStart="download">Export CSV</Button>
       </TableToolbar>
 
-      <Table density={density}>
+      <Table density={density} layout="fixed">
+        {/* Fixed layout: the filter above changes which rows are drawn, and an
+            auto table re-measures every column each time — the Visitor column
+            alone moved 87px between two filters. The shares are proportions of
+            the table, not values from the design scale, which is why they are
+            percentages and not tokens. */}
+        <colgroup>
+          <col style={{ width: '18%' }} />
+          <col style={{ width: '10%' }} />
+          <col style={{ width: '10%' }} />
+          <col style={{ width: '7%' }} />
+          <col style={{ width: '7.5%' }} />
+          <col style={{ width: '10.5%' }} />
+          <col style={{ width: '16%' }} />
+          <col style={{ width: '8%' }} />
+          <col style={{ width: '9%' }} />
+          <col style={{ width: '4%' }} />
+        </colgroup>
+
         <thead>
           <tr>
             <Th>Visitor</Th>
             <Th>Status</Th>
             <Th {...sortProps('risk')}>Risk</Th>
+            {/* Next to Risk on purpose: the two answer different questions, and
+                a crawler scoring 2 for risk and Very high for automation is the
+                clearest way to show it. */}
+            <Th>Bot</Th>
             <Th {...sortProps('visits')}>Visits</Th>
             <Th {...sortProps('paid')}>Paid clicks</Th>
             <Th>Click interval</Th>
@@ -147,6 +223,7 @@ function VisitorTable({ density }: { density?: 'compact' | 'default' | 'comforta
           {sorted.map((row) => {
             const device = deviceMeta[row.device];
             const status = statusMeta[row.status];
+            const bot = botMeta[row.bot];
 
             return (
               <tr key={row.ip} data-clickable="true" tabIndex={0}>
@@ -157,7 +234,14 @@ function VisitorTable({ density }: { density?: 'compact' | 'default' | 'comforta
                 </Td>
 
                 <Td label="Status">
-                  <Pill tone={status.tone} icon={status.icon}>{status.label}</Pill>
+                  {/* One tag, never two. When we are watching an address
+                      precisely because we are unsure, "Not certain" is the more
+                      useful of the two things we could say. */}
+                  {row.unsure ? (
+                    <Pill tone="warning" icon="alert-circle">Not certain</Pill>
+                  ) : (
+                    <Pill tone={status.tone} icon={status.icon}>{status.label}</Pill>
+                  )}
                 </Td>
 
                 <Td label="Risk">
@@ -170,8 +254,15 @@ function VisitorTable({ density }: { density?: 'compact' | 'default' | 'comforta
                   />
                 </Td>
 
+                <Td label="Bot">
+                  <Pill tone={bot.tone} size="sm">{bot.label}</Pill>
+                </Td>
+
                 <Td label="Visits"><CellData>{row.visits}</CellData></Td>
-                <Td label="Paid clicks"><CellData>{row.paid}</CellData></Td>
+
+                <Td label="Paid clicks">
+                  <CellData muted={row.paid === 0}>{row.paid === 0 ? '—' : row.paid}</CellData>
+                </Td>
 
                 <Td label="Click interval">
                   <CellSignal tone={row.rhythm}>{row.interval}</CellSignal>
@@ -185,7 +276,7 @@ function VisitorTable({ density }: { density?: 'compact' | 'default' | 'comforta
 
                 <Td label="Cost" align="end">
                   <CellMoney
-                    value={money(row.cost)}
+                    value={row.cost > 0 ? money(row.cost) : '—'}
                     note={row.saved > 0 ? `${money(row.saved)} saved` : undefined}
                   />
                 </Td>
@@ -203,7 +294,7 @@ function VisitorTable({ density }: { density?: 'compact' | 'default' | 'comforta
 
       <TableFooter>
         <Button variant="secondary" disabled>Previous</Button>
-        <span>Showing 5 of 35 visitors</span>
+        <span>Showing {sorted.length} of {rows.length} visitors</span>
         <Button variant="secondary">Next</Button>
       </TableFooter>
     </TablePanel>
@@ -246,6 +337,34 @@ export const Sorting: Story = {
     // Sorting a second column releases the first, rather than stacking sorts.
     await userEvent.click(canvas.getByRole('button', { name: /visits/i }));
     await expect(header).not.toHaveAttribute('aria-sort');
+  },
+};
+
+/**
+ * The grid holds still while the rows change underneath it.
+ *
+ * An auto-width table measures its content, so narrowing the list to one status
+ * re-measures every column and the whole table twitches sideways — which reads
+ * as the page reloading rather than as a filter applying. `layout="fixed"` plus
+ * the colgroup moves the widths off the content and onto the table.
+ */
+export const ColumnsHoldUnderFilters: Story = {
+  globals: { viewport: { value: 'wide' } },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const widths = () =>
+      [...canvasElement.querySelectorAll('thead th')].map((th) =>
+        Math.round(th.getBoundingClientRect().width),
+      );
+
+    const before = widths();
+    await expect(before).toHaveLength(10);
+
+    for (const label of ['Blocked', 'Not certain', 'Monitoring', 'Clean']) {
+      await userEvent.click(canvas.getByRole('combobox', { name: /status/i }));
+      await userEvent.click(canvas.getByRole('option', { name: label }));
+      // Not "close enough": the same widths, to the pixel.
+      await expect(widths()).toEqual(before);
+    }
   },
 };
 

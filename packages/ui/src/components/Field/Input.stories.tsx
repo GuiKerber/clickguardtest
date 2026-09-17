@@ -124,3 +124,41 @@ export const Clearable: Story = {
     await expect(canvas.queryByRole('button')).toBeNull();
   },
 };
+
+/**
+ * The toolbar's search field: one clear control, not two.
+ *
+ * `type="search"` makes WebKit and Blink draw their own cancel button inside
+ * the field, so a search input with our clear button shows two crosses side by
+ * side and only one of them tells React anything. The stylesheet removes the
+ * browser's, which is why this story asserts the count rather than trusting it.
+ */
+export const SearchType: Story = {
+  render: (args) => {
+    const [value, setValue] = useState('203.0.113.47');
+    return (
+      <Input
+        {...args}
+        type="search"
+        hideLabel
+        iconStart="search"
+        placeholder="Search by IP, city or country"
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        onClear={() => setValue('')}
+      />
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    const field = canvas.getByRole('searchbox');
+    await expect(canvas.getAllByRole('button')).toHaveLength(1);
+
+    // The browser's own cancel button is drawn, not appended, so it has no role
+    // to count — the computed pseudo-element is the only thing that gives it away.
+    const native = getComputedStyle(field, '::-webkit-search-cancel-button');
+    await expect(native.display === 'none' || parseFloat(native.width || '0') === 0).toBe(true);
+
+    await userEvent.click(canvas.getByRole('button', { name: /clear/i }));
+    await expect(field).toHaveValue('');
+  },
+};
