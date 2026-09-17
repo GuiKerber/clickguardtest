@@ -356,7 +356,13 @@
      the band it sits in, so a full dial reads as a journey from safe to fatal.
      Amber-500 appears here because a gauge segment is decorative fill — it is
      never text, which is the only thing that tone fails contrast for.        */
-  --gauge-max-width:     216px;
+  /* The dial is wider than the stack of text inside it, and has to be: the
+     label, the figure and the badge all sit within the dotted guide, so sizing
+     the arc to the text is what puts "Risk score" on top of the segments. The
+     inset below is the guide's own radius expressed as a percentage, so the
+     text block tracks the guide at any size rather than being re-measured. */
+  --gauge-max-width:     294px;
+  --gauge-center-inset:  13.5%;
   --gauge-band-low:      var(--status-success-icon);
   --gauge-band-rising:   var(--color-amber-500);
   --gauge-band-high:     var(--status-warning-text);

@@ -65,6 +65,9 @@ export type {
   CellSignalProps,
 } from './components/Table/Table';
 
+export { Section } from './components/Section/Section';
+export type { SectionProps } from './components/Section/Section';
+
 export { Drawer } from './components/Drawer/Drawer';
 export type { DrawerProps } from './components/Drawer/Drawer';
 

@@ -76,6 +76,116 @@ export function hasConverted(visitor: Visitor) {
   return visitor.visits.some((visit) => visit.conversion);
 }
 
+export function hasFilledForm(visitor: Visitor) {
+  return visitor.visits.some((visit) => visit.formFill);
+}
+
+/* ---- Bot probability -------------------------------------------------------
+   A different question from the risk score, and worth its own column for that
+   reason. Risk asks *what is this costing me and should it be stopped* — it
+   rises with spend, and a cheap nuisance never reaches the top of it. This asks
+   only *is there a person here*, which is answered by behaviour and is just as
+   true of an address that has cost nothing.
+
+   Four pieces of evidence, weighted by how hard each is to fake.
+   -------------------------------------------------------------------------- */
+
+export type BotBand = 'very-low' | 'low' | 'medium' | 'high' | 'very-high';
+
+interface BotReading {
+  score: number;
+  band: BotBand;
+  label: string;
+  /** The single strongest reason, for the tooltip and the drawer. */
+  reason: string;
+}
+
+const botBandLabel: Record<BotBand, string> = {
+  'very-low': 'Very low',
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
+  'very-high': 'Very high',
+};
+
+/** Median, so one outlying visit cannot carry the whole reading. */
+function medianEngagement(visitor: Visitor) {
+  const seconds = visitor.visits.map((visit) => visit.engagementSeconds).sort((a, b) => a - b);
+  return seconds[Math.floor(seconds.length / 2)] ?? 0;
+}
+
+export function botProbabilityOf(visitor: Visitor): BotReading {
+  let score = 0;
+  let reason = 'Nothing in this visitor’s behaviour looks automated.';
+
+  // 1. Timing. A fixed cadence is the hardest thing for a person to produce by
+  //    accident and the easiest for a script to produce by default.
+  const rhythm = rhythmOf(visitor);
+  if (rhythm.kind === 'spam') {
+    score += 45;
+    reason = 'Clicks arrive at a near-fixed interval, far faster than a person browses.';
+  } else if (rhythm.kind === 'clockwork') {
+    score += 35;
+    reason = 'Clicks arrive on an almost exact schedule.';
+  } else if (rhythm.kind === 'bursty') {
+    score += 15;
+  }
+
+  // 2. Where it comes from. A datacentre sells servers, not broadband; a
+  //    verified crawler is openly a machine and says so.
+  if (visitor.device === 'crawler') {
+    score += 40;
+    reason = 'Identifies itself as a search engine crawler.';
+  } else if (visitor.device === 'server') {
+    score += 25;
+    if (score <= 25) reason = 'Connects from a datacentre rather than a home or mobile network.';
+  }
+
+  // 3. Time on page. Nobody reads a page in under two seconds.
+  const engagement = medianEngagement(visitor);
+  if (engagement <= 2) {
+    score += 25;
+    if (score <= 25) reason = 'Leaves within two seconds of arriving, every time.';
+  } else if (engagement <= 10) {
+    score += 12;
+  } else if (engagement >= 60) {
+    score -= 15;
+    reason = 'Spends over a minute on the page — automated traffic does not linger.';
+  }
+
+  /* 4. Proof of a person. A purchase or a completed form is the one thing on
+        this list a script does not produce as a side effect, so it outweighs
+        the rest rather than merely subtracting from them. */
+  if (hasConverted(visitor)) {
+    score = Math.min(score, 10);
+    reason = 'This visitor bought something. A script does not do that by accident.';
+  } else if (hasFilledForm(visitor)) {
+    score = Math.min(score, 25);
+    reason = 'Completed a form with real details, which automated traffic rarely does.';
+  }
+
+  /* A shared address covers thousands of people, so the behaviour on it is a
+     mixture and no single verdict about "the visitor" is safe. Pulled towards
+     the middle rather than cleared: the automation may well be real, but it is
+     not all of what is on this address. */
+  if (visitor.sharedIp) score = Math.round(score * 0.6);
+
+  score = Math.max(0, Math.min(100, score));
+
+  const band: BotBand =
+    score >= 80 ? 'very-high' : score >= 60 ? 'high' : score >= 35 ? 'medium' : score >= 15 ? 'low' : 'very-low';
+
+  return { score, band, label: botBandLabel[band], reason };
+}
+
+export const botBandTone: Record<BotBand, 'clean' | 'suspicious' | 'malicious' | 'neutral'> = {
+  'very-low': 'clean',
+  low: 'clean',
+  medium: 'suspicious',
+  high: 'malicious',
+  'very-high': 'malicious',
+};
+
 /* ---- Money over time -------------------------------------------------------
    Both curves below are derived, never authored. The figure printed on a card
    is the last point of its own series, so the number and the shape can never

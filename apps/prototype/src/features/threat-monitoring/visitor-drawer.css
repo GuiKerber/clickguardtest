@@ -4,21 +4,6 @@
   gap: var(--space-3);
 }
 
-.vd__section-title {
-  color: var(--text-primary);
-  font-size: var(--font-size-400);
-  line-height: var(--line-height-400);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-snug);
-}
-
-.vd__section-note {
-  margin-block-start: calc(var(--space-2) * -1);
-  color: var(--text-secondary);
-  font-size: var(--font-size-200);
-  line-height: var(--line-height-200);
-}
-
 /* The dial and the money it stands for, in one block: a score means nothing
    until it is priced. */
 .vd__score-card {

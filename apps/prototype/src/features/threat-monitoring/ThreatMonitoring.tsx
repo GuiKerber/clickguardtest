@@ -27,6 +27,8 @@ import {
 import { visitors } from '../../data/visitors';
 import type { Visitor, VisitorStatus } from '../../data/types';
 import {
+  botBandTone,
+  botProbabilityOf,
   deviceMeta,
   formatMoney,
   formatRelative,
@@ -40,7 +42,7 @@ import {
 import { VisitorDrawer } from './VisitorDrawer';
 import './threat-monitoring.css';
 
-type SortKey = 'wasted' | 'risk' | 'visits' | 'paid' | 'lastSeen';
+type SortKey = 'wasted' | 'risk' | 'bot' | 'visits' | 'paid' | 'lastSeen';
 
 const statusOrder: VisitorStatus[] = ['blocked', 'monitoring', 'clean'];
 const PAGE_SIZE = 15;
@@ -86,6 +88,7 @@ export function ThreatMonitoring() {
       const value = {
         wasted: left.wasted - right.wasted,
         risk: a.riskScore - b.riskScore,
+        bot: botProbabilityOf(a).score - botProbabilityOf(b).score,
         visits: left.totalVisits - right.totalVisits,
         paid: left.paidVisits - right.paidVisits,
         lastSeen: left.lastSeen - right.lastSeen,
@@ -218,6 +221,7 @@ export function ThreatMonitoring() {
               <col className="cg-col--fit" />
               <col className="cg-col--fit" />
               <col className="cg-col--fit" />
+              <col className="cg-col--fit" />
               <col className="cg-col--icon" />
             </colgroup>
 
@@ -234,6 +238,10 @@ export function ThreatMonitoring() {
                 >
                   Risk
                 </Th>
+                {/* Next to Risk on purpose: the two answer different questions,
+                    and a crawler scoring 2 for risk and high for automation is
+                    the clearest way to show it. */}
+                <Th {...sortProps('bot')}>Bot</Th>
                 <Th {...sortProps('visits')}>
                   Visits
                 </Th>
@@ -321,6 +329,7 @@ function VisitorRow({
   const device = deviceMeta[visitor.device];
   const converted = hasConverted(visitor);
   const saved = savedOf(visitor);
+  const bot = botProbabilityOf(visitor);
   const unsure = visitor.confidence === 'low' && visitor.status === 'monitoring';
 
   return (
@@ -372,6 +381,12 @@ function VisitorRow({
           valueLabel={visitor.riskScore}
           ariaLabel={`Risk score ${visitor.riskScore}, ${visitor.riskBand}`}
         />
+      </Td>
+
+      <Td label="Bot">
+        <Pill tone={botBandTone[bot.band]} size="sm">
+          {bot.label}
+        </Pill>
       </Td>
 
       <Td label="Visits">
