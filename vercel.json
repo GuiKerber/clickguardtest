@@ -3,5 +3,12 @@
   "buildCommand": "npm run build:site",
   "outputDirectory": "dist",
   "installCommand": "npm install",
-  "framework": null
+  "framework": null,
+  "redirects": [
+    {
+      "source": "/storybook",
+      "destination": "/storybook/",
+      "permanent": false
+    }
+  ]
 }

@@ -8,6 +8,14 @@
  * Storybook emits relative asset paths, which is the only reason it survives
  * being moved under a subdirectory. If that ever changes, this script is where
  * it will break — not in production.
+ *
+ * That same relativeness is why vercel.json redirects /storybook to
+ * /storybook/. Without the trailing slash a browser treats the last segment as
+ * a file, so the base URL is / and `./sb-manager/runtime.js` resolves to
+ * /sb-manager/runtime.js, which does not exist. The page answers 200 and then
+ * renders nothing — the worst kind of broken, because every check short of
+ * opening it says the deployment is fine. The slash makes the base
+ * /storybook/ and the same paths resolve.
  */
 import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
