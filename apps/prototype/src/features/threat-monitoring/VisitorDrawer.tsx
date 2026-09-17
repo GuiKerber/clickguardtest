@@ -201,29 +201,6 @@ export function VisitorDrawer({ visitor, onClose }: VisitorDrawerProps) {
               }
             />
           </div>
-
-          {/* Every state gets a line here, not just the ones with bad news. A
-              footer that appears only when an address is unblocked makes its
-              absence the message, and the reader has to know the rule to read
-              it. Each case says where this score stands against the line. */}
-          <p className="vd__score-footer">
-            {visitor.blockedAt ? (
-              <>
-                Blocked on {formatDateTime(visitor.blockedAt)}, after the score passed{' '}
-                {BLOCK_THRESHOLD}. No ads have been shown to this address since.
-              </>
-            ) : visitor.riskScore >= BLOCK_THRESHOLD ? (
-              <>
-                Past {BLOCK_THRESHOLD} but not yet excluded — this address is held back for review
-                because the evidence is not one-sided.
-              </>
-            ) : (
-              <>
-                Not blocked. An address is excluded once its score passes {BLOCK_THRESHOLD}; this
-                one is {BLOCK_THRESHOLD - visitor.riskScore} points short.
-              </>
-            )}
-          </p>
         </div>
 
         {unsure && (
@@ -246,7 +223,6 @@ export function VisitorDrawer({ visitor, onClose }: VisitorDrawerProps) {
       <Section
         title="Access history"
         note="The steps that led to this visitor’s status, oldest first."
-        aside={`${ledger.length} ${ledger.length === 1 ? 'step' : 'steps'}`}
       >
         {visitor.status === 'blocked' && <BlockSummary visitor={visitor} />}
 
@@ -303,7 +279,6 @@ export function VisitorDrawer({ visitor, onClose }: VisitorDrawerProps) {
       <Section
         title="Signals we measured"
         note="Open a signal to see what it means and how it moved the score."
-        aside={`${visitor.signals.length} signals`}
       >
         <div className="vd__signals">
           {visitor.signals.map((signal) => (

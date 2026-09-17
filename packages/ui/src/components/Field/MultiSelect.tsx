@@ -176,7 +176,6 @@ export function MultiSelect({
                   onClick={() => toggle(option.value)}
                 >
                   <span>{option.label}</span>
-                  {value.includes(option.value) && <Icon name="check-circle" size="sm" />}
                 </button>
               </li>
             ))}

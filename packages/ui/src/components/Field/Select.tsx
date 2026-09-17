@@ -163,7 +163,20 @@ export function Select({
           onClick={() => !disabled && setOpen((current) => !current)}
           onKeyDown={onKeyDown}
         >
-          <span className="cg-select__value">{selected?.label ?? placeholder}</span>
+          {/* The trigger is sized by its widest option, not by the current one,
+              so choosing a shorter label cannot make the control shrink under
+              the pointer that just clicked it. The sizer holds every label at
+              zero height; the widest sets the column and the visible value
+              stacks on top of it. */}
+          <span className="cg-select__value-box">
+            <span className="cg-select__value">{selected?.label ?? placeholder}</span>
+            <span className="cg-select__sizer" aria-hidden="true">
+              {placeholder && <span>{placeholder}</span>}
+              {options.map((option) => (
+                <span key={option.value}>{option.label}</span>
+              ))}
+            </span>
+          </span>
           <Icon name="chevron-down" size="sm" className="cg-select__chevron" />
         </button>
 
@@ -181,7 +194,6 @@ export function Select({
                   onClick={() => commit(index)}
                 >
                   <span>{option.label}</span>
-                  {option.value === value && <Icon name="check-circle" size="sm" />}
                 </button>
               </li>
             ))}

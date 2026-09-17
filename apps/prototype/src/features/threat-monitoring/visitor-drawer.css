@@ -22,14 +22,6 @@
   gap: var(--space-3);
 }
 
-.vd__score-footer {
-  padding-block-start: var(--space-1);
-  color: var(--text-secondary);
-  font-size: var(--font-size-200);
-  line-height: var(--line-height-200);
-  text-align: center;
-}
-
 /* Up is bad, down is good — the direction is the point, so it carries colour. */
 .vd__delta-up { color: var(--status-danger-text); }
 .vd__delta-down { color: var(--status-success-text); }

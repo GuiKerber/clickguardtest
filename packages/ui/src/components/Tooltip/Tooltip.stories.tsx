@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect } from 'storybook/test';
+import { expect, waitFor } from 'storybook/test';
 import { InfoTip } from './Tooltip';
 
 const meta = {
@@ -37,10 +37,15 @@ export const Keyboard: Story = {
 
     await userEvent.tab();
     await expect(trigger).toHaveFocus();
-    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    /* Focus opens the tip through React state, so the attribute lands a render
+       after the event. Asserting it directly is a race that passes on a quiet
+       machine and fails on a busy one — which is exactly the kind of test that
+       teaches people to re-run the suite instead of reading it. */
+    await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'true'));
 
     await userEvent.keyboard('{Escape}');
-    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'false'));
   },
 };
 

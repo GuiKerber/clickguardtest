@@ -10,7 +10,6 @@ import {
   CellVerdict,
   EmptyState,
   Input,
-  MultiSelect,
   Pill,
   Progress,
   Select,
@@ -25,7 +24,7 @@ import {
 } from '@clickguard/ui';
 
 import { visitors } from '../../data/visitors';
-import type { Visitor, VisitorStatus } from '../../data/types';
+import type { Visitor } from '../../data/types';
 import {
   botBandTone,
   botProbabilityOf,
@@ -44,13 +43,42 @@ import './threat-monitoring.css';
 
 type SortKey = 'wasted' | 'risk' | 'bot' | 'visits' | 'paid' | 'lastSeen';
 
-const statusOrder: VisitorStatus[] = ['blocked', 'monitoring', 'clean'];
 const PAGE_SIZE = 15;
 
-const statusOptions = statusOrder.map((status) => ({
-  value: status,
-  label: statusMeta[status].label,
-}));
+/**
+ * The filter offers what the Status column prints, not what the data model
+ * stores. "Not certain" is not a status — it is a monitored address we have low
+ * confidence about — but it is the word on the row, so it has to be the word in
+ * the filter. Picking "Monitoring" therefore excludes the uncertain ones: they
+ * are labelled differently, so they filter differently.
+ */
+type StatusFilter = 'all' | 'blocked' | 'not-certain' | 'monitoring' | 'clean';
+
+const statusOptions: { value: StatusFilter; label: string }[] = [
+  { value: 'all', label: 'All statuses' },
+  { value: 'blocked', label: 'Blocked' },
+  { value: 'not-certain', label: 'Not certain' },
+  { value: 'monitoring', label: 'Monitoring' },
+  { value: 'clean', label: 'Clean' },
+];
+
+/** The same test the row uses to decide which pill to print. */
+function isUnsure(visitor: Visitor) {
+  return visitor.confidence === 'low' && visitor.status === 'monitoring';
+}
+
+function matchesStatus(visitor: Visitor, filter: StatusFilter) {
+  switch (filter) {
+    case 'all':
+      return true;
+    case 'not-certain':
+      return isUnsure(visitor);
+    case 'monitoring':
+      return visitor.status === 'monitoring' && !isUnsure(visitor);
+    default:
+      return visitor.status === filter;
+  }
+}
 
 const rangeOptions = [
   { value: '7', label: 'Last 7 days' },
@@ -60,7 +88,7 @@ const rangeOptions = [
 
 export function ThreatMonitoring() {
   const [query, setQuery] = useState('');
-  const [statuses, setStatuses] = useState<VisitorStatus[]>(statusOrder);
+  const [status, setStatus] = useState<StatusFilter>('all');
   const [range, setRange] = useState('30');
   const [sortKey, setSortKey] = useState<SortKey>('wasted');
   const [sortDirection, setSortDirection] = useState<SortDirection>('descending');
@@ -71,7 +99,7 @@ export function ThreatMonitoring() {
     const needle = query.trim().toLowerCase();
 
     const filtered = visitors.filter((visitor) => {
-      if (!statuses.includes(visitor.status)) return false;
+      if (!matchesStatus(visitor, status)) return false;
       if (!needle) return true;
       return (
         visitor.ip.includes(needle) ||
@@ -95,7 +123,7 @@ export function ThreatMonitoring() {
       }[sortKey];
       return value * direction;
     });
-  }, [query, statuses, sortKey, sortDirection]);
+  }, [query, status, sortKey, sortDirection]);
 
   const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
 
@@ -128,11 +156,11 @@ export function ThreatMonitoring() {
 
   function resetFilters() {
     setQuery('');
-    setStatuses(statusOrder);
+    setStatus('all');
     setPage(0);
   }
 
-  const filtersAreNarrowed = query !== '' || statuses.length !== statusOrder.length;
+  const filtersAreNarrowed = query !== '' || status !== 'all';
   const firstShown = rows.length === 0 ? 0 : page * PAGE_SIZE + 1;
   const lastShown = Math.min(rows.length, (page + 1) * PAGE_SIZE);
 
@@ -163,17 +191,15 @@ export function ThreatMonitoring() {
           }}
         />
 
-        <MultiSelect
+        <Select
           label="Status"
           hideLabel
           options={statusOptions}
-          value={statuses}
+          value={status}
           onChange={(next) => {
-            setStatuses(next as VisitorStatus[]);
+            setStatus(next as StatusFilter);
             setPage(0);
           }}
-          placeholder="No status"
-          summaryNoun="statuses"
         />
 
         <Select

@@ -34,6 +34,16 @@
   max-width: var(--field-grow-max);
 }
 
+/* `type="search"` makes the browser draw its own clear button, which lands
+   beside ours and gives the field two crosses that do the same thing. Ours
+   stays: it is the one that resets the page as well as the value, and it is the
+   one the design system can style. */
+.cg-input::-webkit-search-cancel-button,
+.cg-input::-webkit-search-decoration {
+  appearance: none;
+  display: none;
+}
+
 /* Stacked, there is no spare width to take and no room to give away. */
 @media (max-width: 768px) {
   .cg-field--grow { max-width: none; }
@@ -141,9 +151,30 @@
 
 .cg-select[aria-expanded='true'] { border-color: var(--field-border-focus); }
 
+/* Value and sizer share one grid cell, so the box is as wide as the widest
+   thing in it — which is always the longest option, never the current one. */
+.cg-select__value-box {
+  display: grid;
+  min-width: 0;
+}
+
 .cg-select__value {
+  grid-area: 1 / 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cg-select__sizer {
+  grid-area: 1 / 1;
+  display: grid;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.cg-select__sizer > * {
+  grid-area: 1 / 1;
   white-space: nowrap;
 }
 
@@ -191,12 +222,17 @@
    hovering — two different highlights in one list is a puzzle, not a menu. */
 .cg-select__option[data-active='true'] { background-color: var(--surface-hover); }
 
+/* The selected option is marked by its fill alone. `aria-selected` still says
+   so to assistive tech, and the trigger above the list prints the chosen label
+   as text, so nothing here is the sole carrier of the meaning — but a reader
+   who cannot separate this fill from the hover fill has only those two to fall
+   back on. The weight is deliberate: it survives without colour and is not an
+   icon. */
 .cg-select__option[aria-selected='true'] {
   background-color: var(--surface-selected);
   color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
 }
-
-.cg-select__option .cg-icon { color: var(--status-info-icon); }
 
 .cg-field__help {
   color: var(--field-help);

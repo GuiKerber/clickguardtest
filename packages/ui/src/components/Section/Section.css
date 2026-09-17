@@ -4,68 +4,37 @@
   gap: var(--space-2);
 }
 
-/* The heading keeps its semantics; the button inside it carries the behaviour.
-   Putting the button around the heading instead would take a landmark away from
-   anyone navigating by headings. */
 .cg-section__heading {
-  margin: 0;
-  font: inherit;
-}
-
-.cg-section__toggle {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  width: 100%;
-  padding: var(--space-1) var(--space-0);
-  border: 0;
-  background: none;
-  color: var(--text-primary);
-  font-family: inherit;
-  text-align: start;
-  cursor: pointer;
 }
 
-.cg-section__toggle:focus-visible {
-  outline: var(--focus-ring-width) solid var(--focus-ring-color);
-  outline-offset: var(--focus-ring-offset);
-  border-radius: var(--radius-md);
-}
-
-/* The title takes the slack, so everything after it sits at the far end and the
-   arrow lands in the same place whatever the title's length. */
+/* The title takes the slack, so the arrow lands in the same place whatever the
+   title's length. */
 .cg-section__title {
+  margin: 0;
   margin-inline-end: auto;
+  min-width: 0;
+  color: var(--text-primary);
   font-size: var(--font-size-400);
   line-height: var(--line-height-400);
   font-weight: var(--font-weight-semibold);
   letter-spacing: var(--letter-spacing-snug);
 }
 
-.cg-section__aside {
-  color: var(--text-secondary);
-  font-size: var(--font-size-100);
-  line-height: var(--line-height-100);
-  font-weight: var(--font-weight-medium);
-}
+.cg-section__toggle { flex: none; }
 
-.cg-section__arrow {
-  flex: none;
-  color: var(--text-secondary);
-  /* `transform`, not `rotate`: the SVG presentation attribute of the same name
-     shadows the CSS property. */
+/* `transform`, not `rotate`: the SVG presentation attribute of the same name
+   shadows the CSS property. */
+.cg-section__toggle .cg-icon {
   transform: rotate(-90deg);
   transform-origin: center;
   transition: transform var(--duration-fast) var(--easing-standard);
 }
 
-.cg-section[data-open] .cg-section__arrow { transform: rotate(0deg); }
+.cg-section[data-open] .cg-section__toggle .cg-icon { transform: rotate(0deg); }
 
-.cg-section__toggle:hover .cg-section__arrow,
-.cg-section__toggle:hover .cg-section__title { color: var(--text-primary); }
-
-/* Kept visible when the section is folded: a closed section should still say
-   what is inside it. */
 .cg-section__note {
   color: var(--text-secondary);
   font-size: var(--font-size-200);
@@ -78,3 +47,9 @@
   flex-direction: column;
   gap: var(--space-3);
 }
+
+/* Any `display` declared on the element beats the browser's own
+   `[hidden] { display: none }` — same specificity, ours loads later — so the
+   attribute silently stops hiding anything. Restating it here is what makes
+   `hidden` mean hidden. */
+.cg-section__body[hidden] { display: none; }

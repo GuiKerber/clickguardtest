@@ -5,10 +5,9 @@ import { Section } from './Section';
 /**
  * A titled block the reader can fold away.
  *
- * The whole heading row is the control, not just the arrow: a 16px target for
- * an action the entire row already looks like it performs is a target most
- * people miss. The arrow still turns, because it is what says the row can be
- * pressed at all.
+ * Folding hides everything except the title — the note included. A section that
+ * keeps talking after being closed has not really closed, and the reader who
+ * pressed the arrow is left wondering what the arrow did.
  */
 const meta = {
   title: 'Components/Section',
@@ -16,7 +15,8 @@ const meta = {
   parameters: { layout: 'padded' },
   args: {
     title: 'Access history',
-    children: <p>The steps that led to this visitor’s status, oldest first.</p>,
+    note: 'The steps that led to this visitor’s status, oldest first.',
+    children: <p>Timeline goes here.</p>,
   },
 } satisfies Meta<typeof Section>;
 
@@ -27,65 +27,51 @@ export const Open: Story = {};
 
 export const Closed: Story = { args: { defaultOpen: false } };
 
-/** A count on the title row, so a folded section still reports its size. */
-export const WithAside: Story = {
-  args: { aside: '7 steps' },
-};
-
-/**
- * The note sits outside the fold on purpose: a closed section should still say
- * what is inside it, or folding one costs the reader the ability to find it.
- */
-export const WithNote: Story = {
-  args: {
-    defaultOpen: false,
-    aside: '6 signals',
-    note: 'Open a signal to see what it means and how it moved the score.',
-  },
-  play: async ({ canvas }) => {
-    await expect(canvas.getByText(/open a signal to see/i)).toBeVisible();
-  },
-};
-
 /** A long title must not push the arrow out of its column. */
 export const LongTitle: Story = {
-  args: {
-    title: 'Everything we measured about this address before deciding to exclude it',
-    aside: '12 items',
-  },
+  args: { title: 'Everything we measured about this address before deciding to exclude it' },
   play: async ({ canvasElement }) => {
+    const heading = canvasElement.querySelector('.cg-section__heading')!;
     const toggle = canvasElement.querySelector('.cg-section__toggle')!;
-    const arrow = canvasElement.querySelector('.cg-section__arrow')!;
-    await expect(arrow.getBoundingClientRect().right).toBeLessThanOrEqual(
-      Math.ceil(toggle.getBoundingClientRect().right),
+    await expect(toggle.getBoundingClientRect().right).toBeLessThanOrEqual(
+      Math.ceil(heading.getBoundingClientRect().right),
     );
   },
 };
 
 /**
- * The body is wired to the control with `aria-controls` and `aria-expanded`,
- * and hidden with `hidden` rather than `display:none` — so it leaves the
- * accessibility tree, not just the screen.
+ * Closing takes the whole section with it — note and body both. The title is
+ * all that survives, because it is what the reader needs to open it again.
  */
 export const Toggling: Story = {
-  args: { aside: '7 steps' },
   play: async ({ canvas, userEvent, canvasElement }) => {
-    const toggle = canvas.getByRole('button', { name: /access history/i });
+    const toggle = canvas.getByRole('button', { name: /collapse access history/i });
     await expect(toggle).toHaveAttribute('aria-expanded', 'true');
 
-    const bodyId = toggle.getAttribute('aria-controls')!;
-    const body = canvasElement.querySelector(`#${CSS.escape(bodyId)}`)!;
+    const body = canvasElement.querySelector(`#${CSS.escape(toggle.getAttribute('aria-controls')!)}`)!;
     await expect(body).toBeVisible();
 
-    await userEvent.click(toggle);
-    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    // Visibility, not presence: the body stays in the DOM and is hidden with
-    // the `hidden` attribute, which takes it out of the accessibility tree too.
-    await expect(body).not.toBeVisible();
-    await expect(body).toHaveAttribute('hidden');
+    const tall = canvasElement.querySelector('.cg-section')!.getBoundingClientRect().height;
 
     await userEvent.click(toggle);
-    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(body).not.toBeVisible();
+    // The note lives inside the fold, so it goes too.
+    await expect(canvas.queryByText(/oldest first/i)).not.toBeVisible();
+    // Only the title is left.
+    await expect(canvas.getByRole('heading', { name: 'Access history' })).toBeVisible();
+
+    /* Measured, not inferred. `toBeVisible` reads the `hidden` attribute, and a
+       `display` declared on the element overrides that attribute without
+       changing it — which is how this component shipped once looking collapsed
+       in the DOM and open on the screen. The section has to actually shrink. */
+    await expect(getComputedStyle(body).display).toBe('none');
+    const short = canvasElement.querySelector('.cg-section')!.getBoundingClientRect().height;
+    await expect(short).toBeLessThan(tall);
+
+    // The label follows the state, so the control says what it will do next.
+    await expect(canvas.getByRole('button', { name: /expand access history/i })).toBeVisible();
+
+    await userEvent.click(toggle);
     await expect(body).toBeVisible();
   },
 };
@@ -93,7 +79,7 @@ export const Toggling: Story = {
 /** Operable from the keyboard, because it is a real button. */
 export const Keyboard: Story = {
   play: async ({ canvas, userEvent }) => {
-    const toggle = canvas.getByRole('button', { name: /access history/i });
+    const toggle = canvas.getByRole('button', { name: /collapse access history/i });
     await userEvent.tab();
     await expect(toggle).toHaveFocus();
 
@@ -106,10 +92,10 @@ export const Keyboard: Story = {
 export const Several: Story = {
   render: () => (
     <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
-      <Section title="Access history" aside="7 steps" note="Oldest first.">
+      <Section title="Access history" note="Oldest first.">
         <p>Timeline goes here.</p>
       </Section>
-      <Section title="Signals we measured" aside="6 signals" defaultOpen={false}>
+      <Section title="Signals we measured" defaultOpen={false}>
         <p>Signal cards go here.</p>
       </Section>
     </div>
