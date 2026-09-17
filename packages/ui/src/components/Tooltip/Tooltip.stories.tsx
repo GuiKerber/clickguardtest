@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, waitFor } from 'storybook/test';
+import { expect, fireEvent, waitFor } from 'storybook/test';
 import { InfoTip } from './Tooltip';
 
 const meta = {
@@ -25,8 +25,9 @@ export const Default: Story = {
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
 
     await userEvent.click(trigger);
-    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    await expect(canvas.getByRole('tooltip')).toBeVisible();
+    // The tip opens through React state, a render after the event.
+    await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'true'));
+    await waitFor(() => expect(canvas.getByRole('tooltip')).toBeVisible());
   },
 };
 
@@ -35,13 +36,21 @@ export const Keyboard: Story = {
   play: async ({ canvas, userEvent }) => {
     const trigger = canvas.getByRole('button', { name: /what is click fraud/i });
 
+    // Reachable by keyboard at all: Tab has to land on it.
+    (document.activeElement as HTMLElement | null)?.blur();
     await userEvent.tab();
     await expect(trigger).toHaveFocus();
 
-    /* Focus opens the tip through React state, so the attribute lands a render
-       after the event. Asserting it directly is a race that passes on a quiet
-       machine and fails on a busy one — which is exactly the kind of test that
-       teaches people to re-run the suite instead of reading it. */
+    /* Then the focus handler itself, dispatched rather than implied. A browser
+       whose document is not itself focused — a background tab, a headless run —
+       moves `activeElement` without emitting a focus event, so driving this
+       through Tab alone tests the runner's window manager as much as the
+       component. Firing the event directly asserts the behaviour that matters:
+       arriving on this control opens the tip, however the reader got here. */
+    /* `focusIn`, not `focus`: React attaches its listeners at the root and maps
+       `onFocus` onto the bubbling `focusin` event, so a raw `focus` never
+       reaches the handler. */
+    fireEvent.focusIn(trigger);
     await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'true'));
 
     await userEvent.keyboard('{Escape}');
@@ -57,7 +66,7 @@ export const Described: Story = {
   play: async ({ canvas, userEvent }) => {
     const trigger = canvas.getByRole('button', { name: /what is click fraud/i });
     await userEvent.click(trigger);
-    await expect(trigger).toHaveAccessibleDescription(/repeated, non-genuine clicks/i);
+    await waitFor(() => expect(trigger).toHaveAccessibleDescription(/repeated, non-genuine clicks/i));
   },
 };
 

@@ -58,6 +58,7 @@ export type {
   ThProps,
   TdProps,
   TableDensity,
+  TableLayout,
   SortDirection,
   CellStackProps,
   CellMoneyProps,

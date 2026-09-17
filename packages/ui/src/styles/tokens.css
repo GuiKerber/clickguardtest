@@ -63,6 +63,7 @@
   --color-amber-100: #FEF3C7;
   --color-amber-200: #FDE68A;
   --color-amber-500: #F59E0B; /* 2.15:1 — decorative fill only, never text  */
+  --color-amber-550: #B08400; /* 3.42:1 on white, 3.27 on hover — marks only */
   --color-amber-600: #B45309; /* 5.02:1 on white                            */
   --color-amber-700: #92400E; /* 6.84:1 on amber-50                         */
 
@@ -389,6 +390,19 @@
      glance, and a bigger box would ask to be measured. */
   --stat-chart-width:  var(--space-16);
   --stat-chart-height: var(--space-8);
+
+  /* ---- Dot ----------------------------------------------------------------
+     A dot is 8px of solid fill beside a sentence, not a stroked icon, so it can
+     take a lighter tone than the icon set without losing its shape. The warning
+     dot is the one that needed it: at icon weight, amber-600 reads brown next to
+     the red one and the two stop being distinguishable at a glance. Amber-550 is
+     the yellowest tone that still clears 3:1 against both the row and its hover
+     state, which is the floor for a mark this system draws.                   */
+  --dot-neutral: var(--status-neutral-icon);
+  --dot-success: var(--status-success-icon);
+  --dot-warning: var(--color-amber-550);
+  --dot-danger:  var(--status-danger-icon);
+  --dot-info:    var(--status-info-icon);
 
   /* ---- Skeleton (loading placeholder) ------------------------------------- */
   --skeleton-base:  var(--color-neutral-100);

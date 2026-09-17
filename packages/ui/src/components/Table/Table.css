@@ -38,7 +38,15 @@
   line-height: var(--line-height-300);
 }
 
-/* The scalable-column contract:
+/* Columns come from the colgroup rather than from the rows, so the grid holds
+   its shape while the rows change underneath it. */
+.cg-table--fixed { table-layout: fixed; }
+
+/* A fixed column has to let long values wrap, since it can no longer widen to
+   hold them. Long unbroken strings — an IPv6 address — break rather than spill. */
+.cg-table--fixed td { overflow-wrap: anywhere; }
+
+/* The scalable-column contract, for `layout="auto"`:
    grow — takes the leftover space and wraps
    fit  — shrinks to content and never wraps
    icon — fixed square for a single action */

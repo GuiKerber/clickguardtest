@@ -1,7 +1,7 @@
 /* A status bullet. It sits beside a sentence that already says the thing, so it
    is a scanning aid, never the only carrier of meaning. */
 .cg-dot {
-  --dot-color: var(--status-neutral-icon);
+  --dot-color: var(--dot-neutral);
 
   display: inline-block;
   flex-shrink: 0;
@@ -11,7 +11,7 @@
   background-color: var(--dot-color);
 }
 
-.cg-dot--success { --dot-color: var(--status-success-icon); }
-.cg-dot--warning { --dot-color: var(--status-warning-icon); }
-.cg-dot--danger { --dot-color: var(--status-danger-icon); }
-.cg-dot--info { --dot-color: var(--status-info-icon); }
+.cg-dot--success { --dot-color: var(--dot-success); }
+.cg-dot--warning { --dot-color: var(--dot-warning); }
+.cg-dot--danger { --dot-color: var(--dot-danger); }
+.cg-dot--info { --dot-color: var(--dot-info); }

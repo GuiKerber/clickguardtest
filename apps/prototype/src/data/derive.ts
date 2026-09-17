@@ -26,7 +26,7 @@ interface RhythmReading {
   kind: RhythmClass;
   /** The finding as a sentence. The colour beside it only speeds up scanning. */
   text: string;
-  tone: 'danger' | 'warning' | 'neutral';
+  tone: 'danger' | 'warning' | 'success' | 'neutral';
 }
 
 /**
@@ -46,8 +46,21 @@ export function rhythmOf(visitor: Visitor): RhythmReading {
   const times = all.slice(-60);
   const count = all.length;
 
+  /* Green, not grey. In a column about click cadence, the question is whether
+     the timing incriminates this visitor — and a handful of clicks cannot. Grey
+     read as "no reading taken", which left a third of the table saying nothing
+     at all; the absence of a pattern is itself the finding. The sentence still
+     refuses to claim more than it knows. */
+  if (count === 0) {
+    return { kind: 'unknown', text: 'No paid clicks', tone: 'neutral' };
+  }
+
   if (times.length < 4) {
-    return { kind: 'unknown', text: 'Too few clicks to read', tone: 'neutral' };
+    return {
+      kind: 'unknown',
+      text: `${count} ${count === 1 ? 'click' : 'clicks'}, no pattern yet`,
+      tone: 'success',
+    };
   }
 
   const gaps = times.slice(1).map((time, index) => time - times[index]);
@@ -69,7 +82,8 @@ export function rhythmOf(visitor: Visitor): RhythmReading {
     return { kind: 'bursty', text: `${count} clicks in tight runs`, tone: 'warning' };
   }
 
-  return { kind: 'spaced', text: `${count} clicks, uneven gaps`, tone: 'neutral' };
+  // Uneven gaps are what a person produces. This is the clean end of the scale.
+  return { kind: 'spaced', text: `${count} clicks, uneven gaps`, tone: 'success' };
 }
 
 export function hasConverted(visitor: Visitor) {

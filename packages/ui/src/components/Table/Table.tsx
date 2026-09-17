@@ -39,18 +39,38 @@ export function TableFooter({ children, className, ...rest }: HTMLAttributes<HTM
 
 /* ---- Table ---------------------------------------------------------------- */
 
+export type TableLayout = 'auto' | 'fixed';
+
 export interface TableProps extends HTMLAttributes<HTMLTableElement> {
   density?: TableDensity;
   /** Collapses each row into a labelled card below the stack breakpoint. */
   stack?: boolean;
+  /**
+   * `auto` sizes every column to the rows currently drawn — fine for a table
+   * whose contents do not change under the reader.
+   *
+   * `fixed` sizes them from the `colgroup` instead, so filtering the rows
+   * cannot move the columns. Any table with a filter above it wants this: a
+   * grid that re-measures itself on every choice makes the reader re-find each
+   * column, and the widest value in a filtered view is not a layout decision.
+   */
+  layout?: TableLayout;
   children: ReactNode;
 }
 
-export function Table({ density = 'default', stack = true, children, className, ...rest }: TableProps) {
+export function Table({
+  density = 'default',
+  stack = true,
+  layout = 'auto',
+  children,
+  className,
+  ...rest
+}: TableProps) {
   const classes = [
     'cg-table',
     density !== 'default' && `cg-table--${density}`,
     stack && 'cg-table--stack',
+    layout === 'fixed' && 'cg-table--fixed',
     className,
   ]
     .filter(Boolean)

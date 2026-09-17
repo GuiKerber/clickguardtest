@@ -237,18 +237,23 @@ export function ThreatMonitoring() {
             clear the search to see the full list.
           </EmptyState>
         ) : (
-          <Table>
+          <Table layout="fixed">
+            {/* Fixed layout: the filters above this table change which rows are
+                drawn, and an auto table re-measures every column each time —
+                the Visitor column alone moved 87px between two filters. The
+                shares below are proportions of the table, not values from the
+                design scale, which is why they are percentages and not tokens. */}
             <colgroup>
-              <col className="cg-col--grow" />
-              <col className="cg-col--fit" />
-              <col className="cg-col--fit" />
-              <col className="cg-col--fit" />
-              <col className="cg-col--fit" />
-              <col className="cg-col--fit" />
-              <col className="cg-col--fit" />
-              <col className="cg-col--fit" />
-              <col className="cg-col--fit" />
-              <col className="cg-col--icon" />
+              <col style={{ width: '18%' }} />
+              <col style={{ width: '10%' }} />
+              <col style={{ width: '10%' }} />
+              <col style={{ width: '7%' }} />
+              <col style={{ width: '7.5%' }} />
+              <col style={{ width: '10.5%' }} />
+              <col style={{ width: '16%' }} />
+              <col style={{ width: '8%' }} />
+              <col style={{ width: '9%' }} />
+              <col style={{ width: '4%' }} />
             </colgroup>
 
             <thead>
