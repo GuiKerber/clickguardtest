@@ -5,10 +5,16 @@ import {
   Drawer,
   Gauge,
   Pill,
+  ScoreCard,
   Section,
+  SignalCard,
+  SignalList,
   Sparkline,
   StatCard,
+  StatGrid,
   Timeline,
+  TimelineCost,
+  TimelineDelta,
   TimelineItem,
   TimelineThreshold,
   type TimelineTone,
@@ -16,7 +22,6 @@ import {
 
 import type { Visit, Visitor } from '../../data/types';
 import { BlockSummary } from './BlockSummary';
-import { SignalCard } from './SignalCard';
 import {
   BLOCK_THRESHOLD,
   formatDateTime,
@@ -31,7 +36,6 @@ import {
   spendSeries,
   statusMeta,
 } from '../../data/derive';
-import './visitor-drawer.css';
 
 interface Entry {
   key: string;
@@ -86,19 +90,13 @@ function healthTone(running: number): TimelineTone {
 
 /** Runs of repeated visits carry fractional weights; the reader sees whole points. */
 function ScoreLine({ delta, running }: { delta: number; running: number }) {
-  const rounded = Math.round(delta);
   const total = `${Math.round(running)} of 100`;
 
-  if (rounded === 0) return <>Risk score unchanged · {total}</>;
+  if (Math.round(delta) === 0) return <>Risk score unchanged · {total}</>;
 
   return (
     <>
-      Risk score{' '}
-      <span className={rounded > 0 ? 'vd__delta-up' : 'vd__delta-down'}>
-        {rounded > 0 ? '+' : '−'}
-        {Math.abs(rounded)}
-      </span>{' '}
-      · now {total}
+      Risk score <TimelineDelta value={delta} /> · now {total}
     </>
   );
 }
@@ -151,75 +149,100 @@ export function VisitorDrawer({ visitor, onClose }: VisitorDrawerProps) {
       }
     >
       {/* ---- 1. Where this visitor stands ---- */}
-      <section className="vd__section">
-        <div className="vd__score-card">
-          {/* The verdict sits under the score that produced it, so the two are
-              read as one statement rather than as a heading and a fact. */}
-          <Gauge
-            value={visitor.riskScore}
-            label="Risk score"
-            badge={
-              unsure ? (
-                <Pill tone="warning" icon="alert-circle">
-                  Not certain
-                </Pill>
-              ) : (
-                <Pill tone={status.tone} icon={status.icon}>
-                  {status.label}
-                </Pill>
-              )
+      <ScoreCard
+        aside={
+          <>
+            {unsure && (
+              <Callout tone="warning" title="We are not certain about this one. ">
+                {visitor.sharedIp
+                  ? 'This address belongs to a mobile or corporate network, so it can cover thousands of real people. Blocking it would remove genuine customers along with the suspicious activity, which is why we are watching instead of blocking.'
+                  : 'The evidence points both ways: the behaviour looks automated, but this visitor has also done things automated traffic does not do. We are watching rather than blocking.'}
+              </Callout>
+            )}
+
+            {visitor.syncState === 'syncing' && (
+              <Callout tone="info">
+                The exclusion has been sent to {visitor.platform} and is waiting to be applied. Until
+                it is, this visitor can still see your ads.
+              </Callout>
+            )}
+          </>
+        }
+      >
+        {/* The verdict sits under the score that produced it, so the two are
+            read as one statement rather than as a heading and a fact. */}
+        <Gauge
+          value={visitor.riskScore}
+          label="Risk score"
+          badge={
+            unsure ? (
+              <Pill tone="warning" icon="alert-circle">
+                Not certain
+              </Pill>
+            ) : (
+              <Pill tone={status.tone} icon={status.icon}>
+                {status.label}
+              </Pill>
+            )
+          }
+          ariaLabel={`Risk score ${visitor.riskScore} out of 100. Addresses are blocked at ${BLOCK_THRESHOLD}.`}
+        />
+
+        <StatGrid>
+          <StatCard
+            label="Wasted"
+            value={formatMoney(metrics.wasted)}
+            meta={`${metrics.paidVisits} paid clicks`}
+            chart={
+              <Sparkline
+                points={spend}
+                tone="danger"
+                ariaLabel={`Spend on this visitor rose to ${formatMoney(metrics.wasted)} over ${metrics.paidVisits} paid clicks.`}
+              />
             }
-            ariaLabel={`Risk score ${visitor.riskScore} out of 100. Addresses are blocked at ${BLOCK_THRESHOLD}.`}
           />
-
-          <div className="vd__metrics">
-            <StatCard
-              label="Wasted"
-              value={formatMoney(metrics.wasted)}
-              meta={`${metrics.paidVisits} paid clicks`}
-              chart={
+          <StatCard
+            accent={saved > 0}
+            label="Saved"
+            value={saved > 0 ? formatMoney(saved) : '—'}
+            meta={saved > 0 ? 'No ads shown since' : 'Not blocked yet'}
+            chart={
+              savedCurve.length > 0 ? (
                 <Sparkline
-                  points={spend}
-                  tone="danger"
-                  ariaLabel={`Spend on this visitor rose to ${formatMoney(metrics.wasted)} over ${metrics.paidVisits} paid clicks.`}
+                  points={savedCurve}
+                  tone="success"
+                  ariaLabel={`Projected saving since the block, reaching ${formatMoney(saved)}.`}
                 />
-              }
-            />
-            <StatCard
-              accent={saved > 0}
-              label="Saved"
-              value={saved > 0 ? formatMoney(saved) : '—'}
-              meta={saved > 0 ? 'No ads shown since' : 'Not blocked yet'}
-              chart={
-                savedCurve.length > 0 ? (
-                  <Sparkline
-                    points={savedCurve}
-                    tone="success"
-                    ariaLabel={`Projected saving since the block, reaching ${formatMoney(saved)}.`}
-                  />
-                ) : undefined
-              }
-            />
-          </div>
-        </div>
+              ) : undefined
+            }
+          />
+        </StatGrid>
+      </ScoreCard>
 
-        {unsure && (
-          <Callout tone="warning" title="We are not certain about this one. ">
-            {visitor.sharedIp
-              ? 'This address belongs to a mobile or corporate network, so it can cover thousands of real people. Blocking it would remove genuine customers along with the suspicious activity, which is why we are watching instead of blocking.'
-              : 'The evidence points both ways: the behaviour looks automated, but this visitor has also done things automated traffic does not do. We are watching rather than blocking.'}
-          </Callout>
-        )}
+      {/* ---- 2. The raw evidence ----
+          Before the ledger, because it answers the question the reader arrived
+          with. The history explains how the score was reached; the signals
+          explain why it is the right score, and someone who disagrees with the
+          verdict wants the second one first. */}
+      <Section
+        title="Signals we measured"
+        note="Open a signal to see what it means and how it moved the score."
+      >
+        <SignalList>
+          {visitor.signals.map((signal) => (
+            <SignalCard
+              key={signal.label}
+              label={signal.label}
+              value={signal.value}
+              verdict={signal.verdict}
+            >
+              <p>{signal.explain}</p>
+            </SignalCard>
+          ))}
+        </SignalList>
+      </Section>
 
-        {visitor.syncState === 'syncing' && (
-          <Callout tone="info">
-            The exclusion has been sent to {visitor.platform} and is waiting to be applied. Until it
-            is, this visitor can still see your ads.
-          </Callout>
-        )}
-      </section>
-
-      {/* ---- 2. Access history ---- */}
+      {/* ---- 3. Access history ---- */}
       <Section
         title="Access history"
         note="The steps that led to this visitor’s status, oldest first."
@@ -235,13 +258,13 @@ export function VisitorDrawer({ visitor, onClose }: VisitorDrawerProps) {
 
             return (
               <TimelineItem
-              key={entry.key}
-              tone={healthTone(entry.running)}
+                key={entry.key}
+                tone={healthTone(entry.running)}
                 title={
                   <>
                     {count > 1 ? `${count} × ${source.label}` : source.label}
                     {paid ? (
-                      <span className="vd__cost">{formatMoney(entry.cost)}</span>
+                      <TimelineCost>{formatMoney(entry.cost)}</TimelineCost>
                     ) : (
                       <Pill tone="neutral" size="sm">
                         free
@@ -274,19 +297,6 @@ export function VisitorDrawer({ visitor, onClose }: VisitorDrawerProps) {
           })}
         </Timeline>
       </Section>
-
-      {/* ---- 3. The raw evidence ---- */}
-      <Section
-        title="Signals we measured"
-        note="Open a signal to see what it means and how it moved the score."
-      >
-        <div className="vd__signals">
-          {visitor.signals.map((signal) => (
-            <SignalCard key={signal.label} signal={signal} />
-          ))}
-        </div>
-      </Section>
     </Drawer>
   );
 }
-

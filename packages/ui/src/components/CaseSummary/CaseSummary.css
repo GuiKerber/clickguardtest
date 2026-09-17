@@ -1,0 +1,60 @@
+/* Tinted with the tone of the decision it explains: this is the block that
+   says why something was stopped, and a neutral card there would read as a
+   note rather than as a finding. */
+.cg-case {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: var(--border-width-thin) solid var(--status-danger-border);
+  border-radius: var(--radius-md);
+  background-color: var(--status-danger-surface);
+}
+
+.cg-case__title {
+  color: var(--status-danger-text);
+  font-size: var(--font-size-300);
+  line-height: var(--line-height-300);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cg-case__steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cg-case__step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  color: var(--text-primary);
+  font-size: var(--font-size-200);
+  line-height: var(--line-height-300);
+}
+
+/* Numbered blocks, so the reader can see the case being stacked up. */
+.cg-case__index {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--space-5);
+  height: var(--space-5);
+  border-radius: var(--radius-full);
+  background-color: var(--status-danger-border);
+  color: var(--status-danger-text);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Below a rule, because it is the sum of the list rather than one more item. */
+.cg-case__result {
+  padding-block-start: var(--space-3);
+  border-top: var(--border-width-thin) solid var(--status-danger-border);
+  color: var(--status-danger-text);
+  font-size: var(--font-size-200);
+  line-height: var(--line-height-300);
+}

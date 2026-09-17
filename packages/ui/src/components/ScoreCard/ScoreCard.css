@@ -1,0 +1,21 @@
+/* The verdict and its caveats read as one group, so they sit closer to each
+   other than to whatever follows in the panel. */
+.cg-score {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Sunk rather than raised: the panel around it is already the raised surface,
+   so lifting this card again would leave two elevations saying the same thing.
+   The extra padding at the top is the dial's — an arc needs air above it that a
+   line of text does not. */
+.cg-score__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-4) var(--space-4);
+  border: var(--border-width-thin) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-page);
+}

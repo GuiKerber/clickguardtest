@@ -76,6 +76,84 @@ export const Toggling: Story = {
   },
 };
 
+/**
+ * The arrow points at the content, not at the motion.
+ *
+ * Closed it points down — the body is below, waiting. Open it points up, which
+ * is where the reader came from and where the fold goes back to. Pointing the
+ * same way in both states, or sideways in one, leaves the control saying only
+ * "there is a control here".
+ */
+export const ArrowFollowsState: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const section = canvasElement.querySelector('.cg-section')!;
+
+    /* The state, then the rules that read it — not the computed transform.
+       The arrow is animated, and a computed `transform` mid-transition is the
+       frame the easing curve happens to be on; in a throttled or hidden frame
+       it may never advance at all. So the assertion checks the two halves that
+       are actually deterministic: the attribute the CSS keys off, and the
+       declarations keyed off it. */
+    await expect(canvas.getByRole('button', { name: /collapse/i })).toBeVisible();
+    await expect(section).toHaveAttribute('data-open');
+
+    await userEvent.click(canvas.getByRole('button'));
+    await expect(canvas.getByRole('button', { name: /expand/i })).toBeVisible();
+    await expect(section).not.toHaveAttribute('data-open');
+
+    const rules = [...document.styleSheets]
+      .flatMap((sheet) => {
+        try {
+          return [...sheet.cssRules];
+        } catch {
+          return [];
+        }
+      })
+      .filter((rule): rule is CSSStyleRule => 'selectorText' in rule)
+      .filter((rule) => rule.selectorText.includes('cg-section__toggle .cg-icon'));
+
+    const closed = rules.find((rule) => !rule.selectorText.includes('data-open'));
+    const open = rules.find((rule) => rule.selectorText.includes('data-open'));
+
+    // Closed is the glyph as drawn, pointing down at the body it will reveal.
+    await expect(closed!.style.transform).toBe('rotate(0deg)');
+    // Open is a half turn, so the same glyph points back up.
+    await expect(open!.style.transform).toBe('rotate(180deg)');
+  },
+};
+
+/**
+ * The note is a caption on the title, so it sits one notch below it rather than
+ * a full step. Any further and it reads as the first line of the body, which is
+ * the one thing it is not.
+ */
+export const NoteSitsWithTheTitle: Story = {
+  play: async ({ canvasElement }) => {
+    const heading = canvasElement.querySelector('.cg-section__heading')!.getBoundingClientRect();
+    const note = canvasElement.querySelector('.cg-section__note')!.getBoundingClientRect();
+    const gap = Math.round(note.top - heading.bottom);
+    // Read against the scale rather than restated: retuning --space-1 must move
+    // this test with it, not break it.
+    const step = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue('--space-1'),
+    );
+    await expect(gap).toBe(Math.round(step));
+  },
+};
+
+/** Without a note, the body keeps its full step below the heading. */
+export const NoNote: Story = {
+  args: { note: undefined },
+  play: async ({ canvasElement }) => {
+    const heading = canvasElement.querySelector('.cg-section__heading')!.getBoundingClientRect();
+    const body = canvasElement.querySelector('.cg-section__body')!.getBoundingClientRect();
+    const step = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue('--space-1'),
+    );
+    await expect(Math.round(body.top - heading.bottom)).toBeGreaterThan(Math.round(step));
+  },
+};
+
 /** Operable from the keyboard, because it is a real button. */
 export const Keyboard: Story = {
   play: async ({ canvas, userEvent }) => {

@@ -92,3 +92,15 @@ export function StatCard({ label, value, meta, accent, chart }: StatCardProps) {
     </div>
   );
 }
+
+/**
+ * Two cards side by side, one column on a narrow screen.
+ *
+ * Money in this product always comes in pairs — what a visitor cost against
+ * what excluding it saved — and the pair only reads as a comparison while the
+ * two figures share a baseline. Equal columns rather than content-sized ones,
+ * so a long value on the left cannot shrink the card on the right.
+ */
+export function StatGrid({ children }: { children: ReactNode }) {
+  return <div className="cg-stat-grid">{children}</div>;
+}

@@ -1,3 +1,5 @@
+import { CaseSummary } from '@clickguard/ui';
+
 import type { Visitor } from '../../data/types';
 import { BLOCK_THRESHOLD, formatDateTime, formatMoney, isPaid, metricsOf } from '../../data/derive';
 
@@ -6,9 +8,9 @@ const DAY = 24 * 60 * 60 * 1000;
 /**
  * The short version, for the customer who wants the answer before the evidence.
  *
- * Every line is read from the same data as the timeline below it — nothing here
- * is written per visitor, so the summary can never drift from what the ledger
- * actually shows.
+ * This file only shapes the data; `CaseSummary` draws it. Every line is read
+ * from the same source as the timeline below it — nothing here is written per
+ * visitor, so the summary can never drift from what the ledger actually shows.
  */
 export function BlockSummary({ visitor }: { visitor: Visitor }) {
   const metrics = metricsOf(visitor);
@@ -33,25 +35,10 @@ export function BlockSummary({ visitor }: { visitor: Visitor }) {
   ];
 
   return (
-    <aside className="vd__summary">
-      <h4 className="vd__summary-title">Why this visitor was blocked</h4>
-
-      <ol className="vd__summary-steps">
-        {steps.map((step, index) => (
-          <li key={step} className="vd__summary-step">
-            <span className="vd__summary-index" aria-hidden="true">
-              {index + 1}
-            </span>
-            <span>{step}</span>
-          </li>
-        ))}
-      </ol>
-
-      <p className="vd__summary-result">
-        Together these took the score to <strong>{visitor.riskScore}</strong>, past the{' '}
-        {BLOCK_THRESHOLD} mark.
-        {visitor.blockedAt && ` The address was excluded on ${formatDateTime(visitor.blockedAt)}.`}
-      </p>
-    </aside>
+    <CaseSummary title="Why this visitor was blocked" steps={steps}>
+      Together these took the score to <strong>{visitor.riskScore}</strong>, past the{' '}
+      {BLOCK_THRESHOLD} mark.
+      {visitor.blockedAt && ` The address was excluded on ${formatDateTime(visitor.blockedAt)}.`}
+    </CaseSummary>
   );
 }

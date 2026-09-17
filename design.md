@@ -463,16 +463,18 @@ writes rather than `Table`; fixing it properly means exporting `Tr`, `TBody` and
 `THead` and changing the call site. `Components/Table → Stacked` asserts today's
 behaviour so the regression is visible.
 
-**Three exports the prototype never imports.** `Menu` (superseded by
-`MultiSelect`), `InfoTip` (header tooltips were dropped, see §12) and `Skeleton`
-(the prototype ships with data, so no loading state is reachable). They are
-documented and tested; they are simply not on this screen. `TableToolbar` and
-`ToolbarSpacer` left this list when the filters moved inside the card.
+**Four exports the prototype never imports.** `MultiSelect` (displaced when the
+status filter became a single-select), `Menu` (superseded by `MultiSelect` before
+that), `InfoTip` (header tooltips were dropped, see §12) and `Skeleton` (the
+prototype ships with data, so no loading state is reachable). They are documented
+and tested; they are simply not on this screen. `TableToolbar` and `ToolbarSpacer`
+left this list when the filters moved inside the card.
 
-`Dot` is also absent from the prototype's import list, but for the opposite
-reason: it is now used *inside* the system, by `CellSignal` and `Timeline`, so
-the screen gets it without naming it. An export the app reaches through another
-component is composition working, not a component going unused.
+`Icon` and `Dot` are also absent from the prototype's import list, but for the
+opposite reason: both are used *inside* the system — `Dot` by `CellSignal` and
+`Timeline`, `Icon` by almost everything — so the screen gets them without naming
+them. An export the app reaches through another component is composition working,
+not a component going unused.
 
 **One visitor still receives paid clicks after its block.** `89.187.162.44` is a
 hand-built case and keeps two of them deliberately, to exercise the syncing
@@ -486,3 +488,76 @@ after their own exclusion. The saving projection is what surfaced it.
 component pass will either document a `--radius-sm: 4px` exception for controls
 under 20px or accept the rounder checkbox. Nothing on this screen forces the
 decision yet.
+
+---
+
+## 16. What belongs to the system, and what belongs to the screen
+
+The brief warns about a design system nothing imports. The subtler version of
+that failure is a system the screen imports *and then works around* — every
+component comes from the library, but the layout holding them together, and the
+colour of the money inside them, is written again in the screen's own
+stylesheet. Storybook then shows a truthful set of parts and an untruthful
+product, because the parts it can draw are the only ones it has.
+
+The detail panel was in exactly that state. `visitor-drawer.css` was 200 lines
+holding the frame around the dial, the pair of money cards, the colour of a cost,
+the red of a rising score, the signal cards and the summary of a block. None of
+it could appear in Storybook, so the Timeline story drew its costs as plain body
+text while the product drew them in grey.
+
+**The line drawn.** A thing is the system's when it carries a rule that must not
+be decided twice — a shape, a spacing relationship, a colour with a meaning
+attached. A thing is the screen's when it is an arrangement of that vocabulary
+for one purpose, or a calculation over this product's data. So:
+
+| Moved into `@clickguard/ui` | Why |
+| --- | --- |
+| `ScoreCard` | The frame that says "a score and its price are one statement". |
+| `StatGrid` | Equal columns and a shared baseline are what make two figures a comparison. |
+| `TimelineCost` | A cost is always secondary and always fixed-width. |
+| `TimelineDelta` | Up is bad, down is good, sign before colour. A convention, not a layout. |
+| `SignalCard`, `SignalList` | The disclosure pattern and the three verdict tones. |
+| `CaseSummary` | Numbered facts under a conclusion, in the tone of the decision. |
+
+| Stayed in the screen | Why |
+| --- | --- |
+| `BlockSummary.tsx` | Reads the visitor and decides which three facts make the case. Data, not drawing. |
+| `ThreatMonitoring.tsx` column shares | Proportions of one table, not values from a scale. |
+| `derive.ts` | Every reading this product takes: rhythm, bot probability, the money curves. |
+
+What is left of the screen's own CSS is 18 lines — a page title and a row count.
+`visitor-drawer.css` no longer exists.
+
+**Two things the move surfaced.** Promoting code into a place where stories
+compose it found bugs that the app never showed:
+
+- `CaseSummary` was an `<aside>`, which is the `complementary` landmark — the
+  same role the detail panel carries. Two of them on a page turns the panel from
+  somewhere a screen-reader user can jump to into one of several things called
+  "complementary". It is now a plain `div` with a heading, and
+  `Components/CaseSummary → IntroducesNoLandmark` holds that.
+- The `Drawer` story could not have caught it before, because it never put a
+  summary inside a panel. Composition is the test.
+
+---
+
+## 17. The filter that moved the page
+
+Narrowing a long list to a short one removed the page's scrollbar, the viewport
+gained 15px back, and every percentage inside the page re-resolved against a
+container that had just grown — so the whole screen shifted sideways at the
+moment the reader was trying to read the result of their own filter.
+
+This is worth recording because the first fix was aimed at the wrong thing.
+`table-layout: fixed` with a percentage colgroup was added to stop the columns
+re-measuring themselves against their content, and it does: across all five
+status filters the header widths are now identical to the pixel. But the
+container those percentages resolve against was still changing size, so the
+symptom survived a correct fix to a different problem.
+
+`scrollbar-gutter: stable` on `html` reserves the gutter whether or not the page
+currently scrolls. It costs 15px of width once; not reserving it costs a layout
+shift on every filter, search and sort. Where the platform draws overlay
+scrollbars — macOS by default — the gutter is zero and the declaration changes
+nothing.

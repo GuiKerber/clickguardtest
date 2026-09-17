@@ -1,0 +1,105 @@
+/* One card per signal. A stack of hairline-separated rows reads as a spec
+   sheet; the evidence deserves to look like exhibits. */
+.cg-signal-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cg-signal {
+  transition: background-color var(--duration-fast) var(--easing-standard);
+  --signal-accent: var(--status-neutral-icon);
+  --signal-text: var(--text-secondary);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: var(--border-width-thin) solid var(--border-subtle);
+  border-inline-start: var(--space-1) solid var(--signal-accent);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-raised);
+}
+
+.cg-signal--incriminating {
+  --signal-accent: var(--status-danger-icon);
+  --signal-text: var(--status-danger-text);
+}
+
+.cg-signal--exonerating {
+  --signal-accent: var(--status-success-icon);
+  --signal-text: var(--status-success-text);
+}
+
+/* The hover belongs to the card, but only the header opens it — a body that
+   lit up under the pointer would promise a click it does not answer. */
+.cg-signal:has(.cg-signal__head:hover) { background-color: var(--surface-hover); }
+
+.cg-signal__head {
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  text-align: start;
+  border-radius: var(--radius-md);
+}
+
+.cg-signal__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0);
+  min-width: 0;
+}
+
+.cg-signal__label {
+  color: var(--text-secondary);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+}
+
+.cg-signal__value {
+  color: var(--text-primary);
+  font-size: var(--font-size-300);
+  line-height: var(--line-height-300);
+  font-weight: var(--font-weight-medium);
+  overflow-wrap: anywhere;
+}
+
+.cg-signal__aside {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.cg-signal__verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--signal-text);
+  font-size: var(--font-size-100);
+  line-height: var(--line-height-100);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.cg-signal__verdict .cg-icon { color: var(--signal-accent); }
+
+.cg-signal__chevron { color: var(--text-secondary); }
+
+.cg-signal__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-block-start: var(--space-3);
+  margin-block-start: var(--space-3);
+  border-top: var(--border-width-thin) solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: var(--font-size-200);
+  line-height: var(--line-height-300);
+}
+
+.cg-signal__effect { color: var(--signal-text); font-weight: var(--font-weight-medium); }

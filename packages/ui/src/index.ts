@@ -72,11 +72,31 @@ export type { SectionProps } from './components/Section/Section';
 export { Drawer } from './components/Drawer/Drawer';
 export type { DrawerProps } from './components/Drawer/Drawer';
 
-export { Timeline, TimelineItem, TimelineThreshold } from './components/Timeline/Timeline';
-export type { TimelineItemProps, TimelineThresholdProps, TimelineTone } from './components/Timeline/Timeline';
+export {
+  Timeline,
+  TimelineItem,
+  TimelineCost,
+  TimelineDelta,
+  TimelineThreshold,
+} from './components/Timeline/Timeline';
+export type {
+  TimelineItemProps,
+  TimelineDeltaProps,
+  TimelineThresholdProps,
+  TimelineTone,
+} from './components/Timeline/Timeline';
+
+export { ScoreCard } from './components/ScoreCard/ScoreCard';
+export type { ScoreCardProps } from './components/ScoreCard/ScoreCard';
+
+export { SignalCard, SignalList } from './components/Signal/Signal';
+export type { SignalCardProps, SignalVerdict } from './components/Signal/Signal';
+
+export { CaseSummary } from './components/CaseSummary/CaseSummary';
+export type { CaseSummaryProps } from './components/CaseSummary/CaseSummary';
 
 export { InfoTip } from './components/Tooltip/Tooltip';
 export type { InfoTipProps } from './components/Tooltip/Tooltip';
 
-export { Callout, EmptyState, Skeleton, StatCard } from './components/Feedback/Feedback';
+export { Callout, EmptyState, Skeleton, StatCard, StatGrid } from './components/Feedback/Feedback';
 export type { CalloutProps, EmptyStateProps, StatCardProps, CalloutTone } from './components/Feedback/Feedback';

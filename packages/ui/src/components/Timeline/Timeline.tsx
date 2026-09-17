@@ -44,6 +44,41 @@ export function TimelineItem({ tone = 'neutral', title, meta, reason, score, tag
   );
 }
 
+/**
+ * What an entry cost, beside the title it belongs to.
+ *
+ * Secondary, never primary: the money is a fact about the visit, not the visit
+ * itself. Fixed-width figures, so a column of entries lines up down the rail.
+ */
+export function TimelineCost({ children }: { children: ReactNode }) {
+  return <span className="cg-timeline__cost">{children}</span>;
+}
+
+export interface TimelineDeltaProps {
+  /** Rounded before printing: runs carry fractional weights, readers do not. */
+  value: number;
+}
+
+/**
+ * How far this entry moved the score, with the sign the direction deserves.
+ *
+ * Up is bad and down is good, which is the opposite of what a reader expects
+ * from a rising number — so the direction is stated twice, once by the sign and
+ * once by the colour, and never by the colour alone.
+ */
+export function TimelineDelta({ value }: TimelineDeltaProps) {
+  const rounded = Math.round(value);
+  const direction = rounded > 0 ? 'up' : rounded < 0 ? 'down' : 'flat';
+  const sign = rounded > 0 ? '+' : rounded < 0 ? '−' : '';
+
+  return (
+    <span className="cg-timeline__delta" data-direction={direction}>
+      {sign}
+      {Math.abs(rounded)}
+    </span>
+  );
+}
+
 export interface TimelineThresholdProps {
   children: ReactNode;
 }

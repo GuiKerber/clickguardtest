@@ -179,3 +179,22 @@
 }
 
 .cg-stat--accent .cg-stat__value { color: var(--status-success-text); }
+
+/* ---- Stat grid ----------------------------------------------------------------
+   A pair of figures read as a comparison, which needs a shared baseline and
+   equal columns. `1fr 1fr` rather than `auto auto`: a long value on the left
+   must not be allowed to shrink the card on the right.
+
+   Below the stack breakpoint the pair becomes one column — side by side at that
+   width, both figures would wrap mid-number. Literal breakpoint: see
+   --breakpoint-stack in tokens.css.
+   ---------------------------------------------------------------------------- */
+.cg-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+@media (max-width: 768px) {
+  .cg-stat-grid { grid-template-columns: 1fr; }
+}

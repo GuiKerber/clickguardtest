@@ -13,6 +13,17 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+
+  /* The gutter is reserved whether or not the page currently scrolls.
+     Without this, filtering a long list down to a short one removes the
+     scrollbar, the viewport gains its width back, and every percentage inside
+     the page re-resolves against a container that just grew by 15px — so the
+     whole screen jumps sideways at the moment the reader is trying to read the
+     result of their own filter. Reserving the space costs 15px of width once;
+     not reserving it costs a layout shift on every filter, search and sort.
+     Where the platform draws overlay scrollbars — macOS by default — the
+     gutter is zero and this declaration changes nothing. */
+  scrollbar-gutter: stable;
 }
 
 body,

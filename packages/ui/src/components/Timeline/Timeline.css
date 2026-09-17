@@ -95,3 +95,19 @@
 
 .cg-timeline__threshold-tag .cg-icon { color: var(--risk-blocked-icon); }
 
+
+/* What an entry cost. Secondary, because the money is a fact about the visit
+   rather than the visit itself, and fixed-width so the figures line up down
+   the rail. */
+.cg-timeline__cost {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Up is bad here and down is good, which is the reverse of what a rising
+   number usually means — so the sign carries the direction and the colour only
+   repeats it. */
+.cg-timeline__delta { font-variant-numeric: tabular-nums; }
+.cg-timeline__delta[data-direction='up'] { color: var(--status-danger-text); }
+.cg-timeline__delta[data-direction='down'] { color: var(--status-success-text); }
+.cg-timeline__delta[data-direction='flat'] { color: var(--text-secondary); }

@@ -25,17 +25,25 @@
 
 .cg-section__toggle { flex: none; }
 
-/* `transform`, not `rotate`: the SVG presentation attribute of the same name
-   shadows the CSS property. */
+/* Closed points down, open points up: the arrow shows where the content is —
+   below and waiting, or above and already read — rather than which way it will
+   swing. `transform`, not `rotate`: the SVG presentation attribute of the same
+   name shadows the CSS property. */
 .cg-section__toggle .cg-icon {
-  transform: rotate(-90deg);
+  transform: rotate(0deg);
   transform-origin: center;
   transition: transform var(--duration-fast) var(--easing-standard);
 }
 
-.cg-section[data-open] .cg-section__toggle .cg-icon { transform: rotate(0deg); }
+.cg-section[data-open] .cg-section__toggle .cg-icon { transform: rotate(180deg); }
+
+/* A caption on the title, not the first line of the body — so it sits one
+   notch under the heading rather than a full step, and only sections that
+   carry one tighten up. */
+.cg-section:has(.cg-section__note) { gap: var(--space-1); }
 
 .cg-section__note {
+  margin-block-end: var(--space-1);
   color: var(--text-secondary);
   font-size: var(--font-size-200);
   line-height: var(--line-height-200);

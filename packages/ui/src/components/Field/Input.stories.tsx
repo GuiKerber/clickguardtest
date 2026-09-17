@@ -151,12 +151,28 @@ export const SearchType: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     const field = canvas.getByRole('searchbox');
+    // Ours is the only control in the field that is a control at all.
     await expect(canvas.getAllByRole('button')).toHaveLength(1);
 
-    // The browser's own cancel button is drawn, not appended, so it has no role
-    // to count — the computed pseudo-element is the only thing that gives it away.
-    const native = getComputedStyle(field, '::-webkit-search-cancel-button');
-    await expect(native.display === 'none' || parseFloat(native.width || '0') === 0).toBe(true);
+    /* The browser's cancel button is painted by the engine, not appended to the
+       DOM: it has no node, no role and no reliable computed style to read back.
+       The rule that removes it is the only thing that can be asserted, so the
+       assertion goes looking for the rule. Without it this field ships two
+       crosses, and only one of them tells React anything. */
+    const rules = [...document.styleSheets].flatMap((sheet) => {
+      try {
+        return [...sheet.cssRules];
+      } catch {
+        return [];
+      }
+    });
+    const removed = rules.some(
+      (rule) =>
+        'selectorText' in rule &&
+        String(rule.selectorText).includes('-webkit-search-cancel-button') &&
+        (rule as CSSStyleRule).style.display === 'none',
+    );
+    await expect(removed).toBe(true);
 
     await userEvent.click(canvas.getByRole('button', { name: /clear/i }));
     await expect(field).toHaveValue('');
